@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import './progress.css'
+
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { Inspector } from './components/Inspector'

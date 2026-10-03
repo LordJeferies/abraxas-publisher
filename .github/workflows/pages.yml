@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - v1.3-publishing-center
-
   workflow_dispatch:
 
 permissions:
@@ -43,17 +41,17 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build:web
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Verify static guide
+      - name: Verify static output
         run: |
           test -f dist/index.html
           test -f dist/guide.html
           test -f dist/manifest.webmanifest
           test -f dist/sw.js
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3

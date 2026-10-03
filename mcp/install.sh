@@ -21,29 +21,43 @@ BRIDGE="$ROOT/src-tauri/target/release/publisher_mcp_bridge"
 
 node "$ROOT/mcp/server.mjs" --self-test
 
-cat <<EOF
+INSTALL_DIR="$HOME/.local/share/abraxas-publisher-mcp"
+mkdir -p "$INSTALL_DIR"
 
-ABRAXAS Publisher MCP listo.
+cp "$ROOT/mcp/server.mjs" "$INSTALL_DIR/server.mjs"
+cp "$BRIDGE" "$INSTALL_DIR/publisher_mcp_bridge"
+chmod +x "$INSTALL_DIR/publisher_mcp_bridge"
 
-Servidor:
-  $ROOT/mcp/server.mjs
-
-Bridge:
-  $BRIDGE
-
-Configuración MCP genérica:
-
+cat > "$INSTALL_DIR/mcp-config.json" <<EOF
 {
   "mcpServers": {
     "abraxas-publisher": {
       "command": "node",
-      "args": ["$ROOT/mcp/server.mjs"],
+      "args": ["$INSTALL_DIR/server.mjs"],
       "env": {
-        "ABRAXAS_PUBLISHER_MCP_BRIDGE": "$BRIDGE"
+        "ABRAXAS_PUBLISHER_MCP_BRIDGE": "$INSTALL_DIR/publisher_mcp_bridge"
       }
     }
   }
 }
+EOF
 
-Consulta docs/MCP.md para ChatGPT/Codex/Claude y criterios de seguridad.
+cat <<EOF
+
+ABRAXAS Publisher MCP listo.
+
+Instalación estable:
+  $INSTALL_DIR
+
+Servidor:
+  $INSTALL_DIR/server.mjs
+
+Bridge:
+  $INSTALL_DIR/publisher_mcp_bridge
+
+Configuración MCP:
+  $INSTALL_DIR/mcp-config.json
+
+Copia el objeto de mcp-config.json en el cliente MCP que uses.
+Consulta docs/MCP.md para criterios y ejemplos.
 EOF

@@ -162,15 +162,16 @@ fn main() {
         std::process::exit(2);
     }
 
-    let input = args.get(2)
-        .map(|x| serde_json::from_str::<Value>(x).map_err(|e| e.to_string()))
-        .transpose()
-        .unwrap_or_else(|e| Err(e))
-        .unwrap_or_else(|e| {
-            eprintln!("ERROR: {e}");
-            std::process::exit(2);
-        })
-        .unwrap_or_else(|| json!({}));
+    let input = match args.get(2) {
+        Some(raw) => match serde_json::from_str::<Value>(raw) {
+            Ok(value) => value,
+            Err(error) => {
+                eprintln!("ERROR: JSON inválido: {error}");
+                std::process::exit(2);
+            }
+        },
+        None => json!({}),
+    };
 
     match run(&args[1], input) {
         Ok(value) => println!("{}", serde_json::to_string(&value).unwrap_or_else(|_| "null".into())),

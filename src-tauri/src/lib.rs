@@ -2,6 +2,7 @@ pub mod core;
 pub mod db;
 pub mod drive;
 pub mod models;
+pub mod publishing;
 pub mod scanner;
 
 use chrono::Utc;
@@ -401,6 +402,72 @@ fn clear_workspace(state: State<'_, AppState>) -> Result<bool, String> {
     db::clear(&state.db_path)
 }
 
+#[tauri::command]
+fn list_connected_accounts(
+    state: State<'_, AppState>,
+) -> Result<Vec<publishing::ConnectedAccount>, String> {
+    publishing::list_accounts(&state.db_path)
+}
+
+#[tauri::command]
+fn save_connected_account(
+    input: publishing::SaveAccountInput,
+    state: State<'_, AppState>,
+) -> Result<publishing::ConnectedAccount, String> {
+    publishing::save_account(&state.db_path, input)
+}
+
+#[tauri::command]
+fn remove_connected_account(
+    account_id: String,
+    state: State<'_, AppState>,
+) -> Result<bool, String> {
+    publishing::remove_account(&state.db_path, &account_id)
+}
+
+#[tauri::command]
+fn list_publication_jobs(
+    state: State<'_, AppState>,
+) -> Result<Vec<publishing::PublishJob>, String> {
+    publishing::list_jobs(&state.db_path)
+}
+
+#[tauri::command]
+fn publishing_preflight(
+    target_id: String,
+    account_id: Option<String>,
+    state: State<'_, AppState>,
+) -> Result<publishing::PreflightReport, String> {
+    publishing::preflight(&state.db_path, &target_id, account_id.as_deref())
+}
+
+#[tauri::command]
+fn enqueue_publications(
+    inputs: Vec<publishing::EnqueueInput>,
+    state: State<'_, AppState>,
+) -> Result<Vec<publishing::PublishJob>, String> {
+    publishing::enqueue(&state.db_path, &inputs)
+}
+
+#[tauri::command]
+fn mark_scheduled_external(
+    target_id: String,
+    method: String,
+    scheduled_at: Option<String>,
+    remote_url: Option<String>,
+    note: Option<String>,
+    state: State<'_, AppState>,
+) -> Result<publishing::ExternalPublication, String> {
+    publishing::mark_external(
+        &state.db_path,
+        &target_id,
+        &method,
+        scheduled_at.as_deref(),
+        remote_url.as_deref(),
+        note.as_deref(),
+    )
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -413,6 +480,7 @@ pub fn run() {
             let db_path = dir.join("abraxas-publisher.sqlite3");
 
             db::init(&db_path).map_err(std::io::Error::other)?;
+            publishing::init(&db_path).map_err(std::io::Error::other)?;
 
             app.manage(AppState {
                 db_path,
@@ -424,6 +492,13 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             health,
+            list_connected_accounts,
+            save_connected_account,
+            remove_connected_account,
+            list_publication_jobs,
+            publishing_preflight,
+            enqueue_publications,
+            mark_scheduled_external,
             list_brands,
             create_brand,
             preview_import_local,

@@ -14,9 +14,83 @@ import type {
   ScheduleChange,
   SimulationReport,
   WorkflowStatus,
+  ConnectedAccount,
+  SaveAccountInput,
+  PublishJob,
+  EnqueueInput,
+  PreflightReport,
+  ExternalPublication,
 } from '../types'
 
 export const backend = {
+
+  listConnectedAccounts: () =>
+    invoke<ConnectedAccount[]>(
+      'list_connected_accounts',
+    ),
+
+  saveConnectedAccount: (
+    input: SaveAccountInput,
+  ) =>
+    invoke<ConnectedAccount>(
+      'save_connected_account',
+      { input },
+    ),
+
+  removeConnectedAccount: (
+    accountId: string,
+  ) =>
+    invoke<boolean>(
+      'remove_connected_account',
+      { accountId },
+    ),
+
+  listPublicationJobs: () =>
+    invoke<PublishJob[]>(
+      'list_publication_jobs',
+    ),
+
+  publishingPreflight: (
+    targetId: string,
+    accountId?: string | null,
+  ) =>
+    invoke<PreflightReport>(
+      'publishing_preflight',
+      {
+        targetId,
+        accountId:
+          accountId || null,
+      },
+    ),
+
+  enqueuePublications: (
+    inputs: EnqueueInput[],
+  ) =>
+    invoke<PublishJob[]>(
+      'enqueue_publications',
+      { inputs },
+    ),
+
+  markScheduledExternal: (
+    targetId: string,
+    method: string,
+    scheduledAt?: string | null,
+    remoteUrl?: string | null,
+    note?: string | null,
+  ) =>
+    invoke<ExternalPublication>(
+      'mark_scheduled_external',
+      {
+        targetId,
+        method,
+        scheduledAt:
+          scheduledAt || null,
+        remoteUrl:
+          remoteUrl || null,
+        note:
+          note || null,
+      },
+    ),
   health: () =>
     invoke<HealthReport>('health'),
 

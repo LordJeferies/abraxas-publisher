@@ -12,6 +12,8 @@ import { KanbanView } from './views/KanbanView'
 import { ImportView } from './views/ImportView'
 import { CalendarView } from './views/CalendarView'
 import { QueueView } from './views/QueueView'
+import { PublishView } from './views/PublishView'
+import { AccountsView } from './views/AccountsView'
 import { ActivityView } from './views/ActivityView'
 import { HelpView } from './views/HelpView'
 import { SettingsView } from './views/SettingsView'
@@ -30,6 +32,8 @@ function MainView() {
   if (v === 'import') return <ImportView/>
   if (v === 'calendar') return <CalendarView/>
   if (v === 'queue') return <QueueView/>
+  if (v === 'publish') return <PublishView/>
+  if (v === 'accounts') return <AccountsView/>
   if (v === 'activity') return <ActivityView/>
   if (v === 'help') return <HelpView/>
   if (v === 'settings') return <SettingsView/>

@@ -176,3 +176,94 @@ export interface HealthReport {
   ffprobe: boolean
   appDataDir: string
 }
+
+export type Provider =
+  | 'instagram'
+  | 'facebook'
+  | 'linkedin'
+  | 'youtube'
+  | 'tiktok'
+  | string
+
+export interface ConnectedAccount {
+  id: string
+  provider: Provider
+  brand?: string | null
+  displayName: string
+  handle?: string | null
+  accountKind: string
+  connectionStatus: string
+  authState: string
+  capabilitiesJson: string
+  externalReference?: string | null
+  lastVerifiedAt?: string | null
+  lastError?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SaveAccountInput {
+  id?: string | null
+  provider: string
+  brand?: string | null
+  displayName: string
+  handle?: string | null
+  accountKind: string
+  connectionStatus: string
+  authState: string
+  capabilitiesJson: string
+  externalReference?: string | null
+}
+
+export interface PublishJob {
+  id: string
+  targetId: string
+  contentId: string
+  provider: string
+  accountId?: string | null
+  mode: string
+  scheduledFor?: string | null
+  status: string
+  idempotencyKey: string
+  attempt: number
+  maxAttempts: number
+  remoteId?: string | null
+  remoteUrl?: string | null
+  lastErrorCode?: string | null
+  lastErrorMessage?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface EnqueueInput {
+  targetId: string
+  accountId?: string | null
+  mode: string
+}
+
+export interface PreflightCheck {
+  key: string
+  label: string
+  ok: boolean
+  blocking: boolean
+  detail?: string | null
+}
+
+export interface PreflightReport {
+  targetId: string
+  accountId?: string | null
+  provider: string
+  ready: boolean
+  checks: PreflightCheck[]
+}
+
+export interface ExternalPublication {
+  id: string
+  targetId: string
+  provider: string
+  method: string
+  scheduledAt?: string | null
+  remoteUrl?: string | null
+  note?: string | null
+  createdAt: string
+}

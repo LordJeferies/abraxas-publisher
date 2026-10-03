@@ -14,6 +14,8 @@ export type View =
   | 'kanban'
   | 'calendar'
   | 'queue'
+  | 'publish'
+  | 'accounts'
   | 'import'
   | 'activity'
   | 'help'

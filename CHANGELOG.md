@@ -31,3 +31,40 @@
 - publisher-mcp;
 - QA automatizado;
 - publicación social real sigue desactivada.
+
+## 0.4.0 · Publisher V1.3
+
+### Publishing Center
+
+- Accounts Center.
+- Provider capability registry.
+- Publishing wizard.
+- Selection basket.
+- Destination/account selection.
+- Preflight.
+- Platform mockups.
+- Persistent publication jobs.
+- Idempotency keys.
+- Queue V1.3.
+- SCHEDULED_EXTERNAL.
+- External scheduler provenance.
+- Publishing-specific navigation.
+- Contextual network themes.
+
+### Preserved
+
+- V1.2 SQLite data.
+- brands.
+- content.
+- calendar.
+- notes.
+- Drive.
+- activity.
+- publisherctl.
+- MCP.
+- existing scheduling.
+
+### Safety
+
+No provider is considered connected without verified auth.
+No remote publishing is claimed without remote verification.

@@ -1,4 +1,282 @@
-import { backend } from '../lib/backend'
-import { useAppStore } from '../lib/store'
-import { PlayCircle } from 'lucide-react'
-export function QueueView(){const{contents,setSimulation,simulation,openDetail}=useAppStore();const targets=contents.flatMap(c=>c.targets.map(t=>({c,t}))).sort((a,b)=>String(a.t.scheduledAt||'z').localeCompare(String(b.t.scheduledAt||'z')));const simulate=async()=>setSimulation(await backend.simulateBatch());return <div className="page scrollable"><header className="page-header compact"><div><span className="eyebrow">COLA LOCAL</span><h1>Cola</h1><p>Última comprobación antes del Paso 2. No hay publicación real.</p></div><button className="primary-btn" onClick={simulate}><PlayCircle size={16}/> Simular lote</button></header><section className="panel">{targets.map(({c,t})=><button className="queue-row clickable" key={t.id} onClick={()=>openDetail(c.id)}><span className="queue-time">{t.scheduledAt?new Date(t.scheduledAt).toLocaleString():'Sin hora'}</span><div><strong>{c.title}</strong><small>{t.platform} · {t.account||'sin cuenta'} · {c.status.replaceAll('_',' ')}</small></div><span className="queue-status">{t.status}</span></button>)}</section>{simulation&&<div className="simulation"><h3>Simulación</h3><div className="simulation-total"><strong>{simulation.totalTargets}</strong><span>destinos procesados</span></div><div className="simulation-platforms">{simulation.platforms.map(p=><div key={p.platform}><b>{p.platform}</b><span>{p.ready} OK · {p.warnings} warn · {p.errors} error</span></div>)}</div><p>{simulation.note}</p></div>}</div>}
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock3,
+  LoaderCircle,
+  RefreshCcw,
+} from 'lucide-react'
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+
+import {
+  backend,
+} from '../lib/backend'
+
+import {
+  useAppStore,
+} from '../lib/store'
+
+import type {
+  PublishJob,
+} from '../types'
+
+const groups = [
+  'REVIEW_REQUIRED',
+  'QUEUED',
+  'DISPATCHING',
+  'PROCESSING_REMOTE',
+  'VERIFYING',
+  'SCHEDULED_REMOTE',
+  'SCHEDULED_EXTERNAL',
+  'PUBLISHED',
+  'FAILED',
+]
+
+function JobIcon({
+  status,
+}: {
+  status: string
+}) {
+  if (
+    status === 'FAILED'
+  ) {
+    return (
+      <AlertTriangle/>
+    )
+  }
+
+  if (
+    status === 'PUBLISHED'
+    || status
+      === 'SCHEDULED_REMOTE'
+  ) {
+    return (
+      <CheckCircle2/>
+    )
+  }
+
+  if (
+    status === 'DISPATCHING'
+    || status
+      === 'PROCESSING_REMOTE'
+    || status
+      === 'VERIFYING'
+  ) {
+    return (
+      <LoaderCircle/>
+    )
+  }
+
+  return (
+    <Clock3/>
+  )
+}
+
+export function QueueView() {
+  const [
+    jobs,
+    setJobs,
+  ] =
+    useState<
+      PublishJob[]
+    >([])
+
+  const contents =
+    useAppStore(
+      (s) => s.contents,
+    )
+
+  const openDetail =
+    useAppStore(
+      (s) => s.openDetail,
+    )
+
+  const load =
+    async () => {
+      setJobs(
+        await backend
+          .listPublicationJobs(),
+      )
+    }
+
+  useEffect(
+    () => {
+      load()
+        .catch(
+          console.error,
+        )
+    },
+    [],
+  )
+
+  const byStatus =
+    useMemo(
+      () =>
+        Object.fromEntries(
+          groups.map(
+            (status) => [
+              status,
+              jobs.filter(
+                (job) =>
+                  job.status
+                  === status,
+              ),
+            ],
+          ),
+        ) as
+        Record<
+          string,
+          PublishJob[]
+        >,
+      [
+        jobs,
+      ],
+    )
+
+  return (
+    <div className="page scrollable queue-page">
+      <header className="page-header">
+        <div>
+          <span className="eyebrow">
+            PUBLICACIÓN
+          </span>
+
+          <h1>
+            Cola
+          </h1>
+
+          <p>
+            Jobs persistentes, reintentos, verificación y estado remoto.
+          </p>
+        </div>
+
+        <button
+          className="secondary-btn"
+          onClick={load}
+        >
+          <RefreshCcw size={15}/>
+          Actualizar
+        </button>
+      </header>
+
+      <div className="queue-summary">
+        {
+          groups.map(
+            (status) => (
+              <div key={status}>
+                <strong>
+                  {
+                    byStatus[
+                      status
+                    ]?.length
+                    || 0
+                  }
+                </strong>
+
+                <span>
+                  {status}
+                </span>
+              </div>
+            ),
+          )
+        }
+      </div>
+
+      <section className="panel job-list">
+        {
+          jobs.map(
+            (job) => {
+              const content =
+                contents.find(
+                  (x) =>
+                    x.id
+                    === job.contentId,
+                )
+
+              return (
+                <button
+                  className="job-row"
+                  key={job.id}
+                  onClick={() => {
+                    if (
+                      content
+                    ) {
+                      openDetail(
+                        content.id,
+                      )
+                    }
+                  }}
+                >
+                  <div
+                    className={
+                      `job-icon status-${job.status}`
+                    }
+                  >
+                    <JobIcon
+                      status={
+                        job.status
+                      }
+                    />
+                  </div>
+
+                  <div className="job-main">
+                    <small>
+                      {
+                        job.provider
+                          .toUpperCase()
+                      }
+                    </small>
+
+                    <strong>
+                      {
+                        content?.title
+                        || job.contentId
+                      }
+                    </strong>
+
+                    <span>
+                      {
+                        job.scheduledFor
+                          ? new Date(
+                              job.scheduledFor,
+                            ).toLocaleString()
+                          : 'Sin fecha'
+                      }
+                    </span>
+                  </div>
+
+                  <div className="job-state">
+                    <b>
+                      {job.status}
+                    </b>
+
+                    <small>
+                      intento {
+                        job.attempt
+                      } / {
+                        job.maxAttempts
+                      }
+                    </small>
+                  </div>
+                </button>
+              )
+            },
+          )
+        }
+
+        {
+          !jobs.length
+          && (
+            <div className="empty-state">
+              La cola está vacía. Ve a Preparar publicación.
+            </div>
+          )
+        }
+      </section>
+    </div>
+  )
+}

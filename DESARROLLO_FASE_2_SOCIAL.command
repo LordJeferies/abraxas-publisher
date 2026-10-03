@@ -262,12 +262,14 @@ app.write_text(s)
 
 side = Path('src/components/Sidebar.tsx')
 s = side.read_text()
-if "Plug," not in s:
+if "  Plug,\n" not in s:
     s = s.replace("  UsersRound,\n", "  UsersRound,\n  Plug,\n")
 if "'providers'" not in s:
     marker = "    [\n      'accounts',\n      UsersRound,\n      'Cuentas',\n    ],\n"
     insert = marker + "    [\n      'providers',\n      Plug,\n      'Proveedores',\n    ],\n"
-    s = s.replace(marker, insert)
+    if marker not in s:
+        raise SystemExit('No se encontró el bloque de Accounts en Sidebar.tsx')
+    s = s.replace(marker, insert, 1)
 s = s.replace('Publisher · v1.3.2', 'Publisher · v1.4')
 side.write_text(s)
 PY

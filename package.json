@@ -10,7 +10,11 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "check": "tsc --noEmit",
-    "build:web": "tsc && vite build"
+    "build:web": "tsc && vite build",
+    "mcp:check": "cargo check --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge",
+    "mcp:build": "cargo build --release --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge",
+    "mcp:test": "npm run mcp:build && node mcp/server.mjs --self-test",
+    "mcp:install": "bash mcp/install.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

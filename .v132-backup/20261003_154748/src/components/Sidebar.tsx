@@ -8,7 +8,6 @@ import {
   ListChecks,
   Send,
   Settings,
-  RefreshCw,
   Upload,
   UsersRound,
   CircleHelp,
@@ -77,11 +76,6 @@ const operationsItems:
       'activity',
       Activity,
       'Actividad',
-    ],
-    [
-      'sync',
-      RefreshCw,
-      'Sincronización',
     ],
   ]
 
@@ -164,7 +158,7 @@ export function Sidebar() {
           </strong>
 
           <span>
-            Publisher · v1.3.2
+            Publisher · v1.3
           </span>
         </div>
       </div>

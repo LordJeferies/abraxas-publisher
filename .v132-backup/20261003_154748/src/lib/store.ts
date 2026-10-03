@@ -16,7 +16,6 @@ export type View =
   | 'queue'
   | 'publish'
   | 'accounts'
-  | 'sync'
   | 'import'
   | 'activity'
   | 'help'

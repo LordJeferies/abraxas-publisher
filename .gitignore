@@ -3,3 +3,32 @@ dist/
 src-tauri/target/
 .DS_Store
 *.log
+.env
+.env.local
+.env.*.local
+.supabase-discovered-*.env
+.v132-runtime.env
+.v132-supabase.env
+
+# Local development/recovery
+.v132-final-backup/
+*.before-curl-fix.*
+*.pre-repair.*
+REPARAR_SUPABASE_Y_CONTINUAR_V132.command
+REPARAR_Y_FINALIZAR_V132.command
+
+# ABRAXAS local recovery
+.v132-final-backup/
+*.before-fix.*
+*.before-curl-fix.*
+*.pre-repair.*
+*.command.pre-repair.*
+*.command.before-curl-fix.*
+.supabase-discovered-*.env
+.v132-runtime.env
+.v132-supabase.env
+REPARAR_CAUSA_RAIZ_V132.command
+REPARAR_Y_FINALIZAR_V132.command
+REPARAR_SUPABASE_Y_CONTINUAR_V132.command
+CONTINUAR_V132_DESDE_TYPESCRIPT.command
+CERRAR_V132_DESDE_REALTIME_FIX.command

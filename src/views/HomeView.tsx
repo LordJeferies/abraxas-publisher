@@ -19,6 +19,10 @@ import {
   useAppStore,
 } from '../lib/store'
 
+import {
+  DesktopDownload,
+} from '../components/DesktopDownload'
+
 export function HomeView() {
   const {
     contents,
@@ -68,7 +72,7 @@ export function HomeView() {
     <div className="page scrollable welcome-page">
       <section className="welcome-hero">
         <span className="eyebrow">
-          ABRAXAS PUBLISHER · V1.2
+          ABRAXAS PUBLISHER · V1.3.2
         </span>
 
         <h1>
@@ -237,6 +241,8 @@ export function HomeView() {
           </div>
         </button>
       </div>
+
+      <DesktopDownload/>
 
       <section className="panel recent-panel">
         <div className="panel-title-row">

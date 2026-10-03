@@ -1,7 +1,7 @@
 {
   "name": "abraxas-publisher",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.4.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 1420",
@@ -9,13 +9,11 @@
     "preview": "vite preview",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "check": "tsc --noEmit",
-    "build:web": "tsc && vite build"
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/utilities": "^3.2.2",
-    "@supabase/supabase-js": "^2.117.2",
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.0",
     "@ybouane/liquidglass": "1.0.3",

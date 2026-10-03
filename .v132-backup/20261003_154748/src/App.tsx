@@ -14,7 +14,6 @@ import { CalendarView } from './views/CalendarView'
 import { QueueView } from './views/QueueView'
 import { PublishView } from './views/PublishView'
 import { AccountsView } from './views/AccountsView'
-import { SyncView } from './views/SyncView'
 import { ActivityView } from './views/ActivityView'
 import { HelpView } from './views/HelpView'
 import { SettingsView } from './views/SettingsView'
@@ -35,7 +34,6 @@ function MainView() {
   if (v === 'queue') return <QueueView/>
   if (v === 'publish') return <PublishView/>
   if (v === 'accounts') return <AccountsView/>
-  if (v === 'sync') return <SyncView/>
   if (v === 'activity') return <ActivityView/>
   if (v === 'help') return <HelpView/>
   if (v === 'settings') return <SettingsView/>
@@ -56,30 +54,15 @@ export default function App() {
   } = useAppStore()
 
   useEffect(() => {
-    const load = () => {
-      Promise.all([
-        backend.listContents(),
-        backend.listBrands(),
-      ])
-        .then(([content, brandList]) => {
-          setContents(content)
-          setBrands(brandList)
-        })
-        .catch(console.error)
-    }
-
-    load()
-
-    window.addEventListener(
-      'abraxas-portable-updated',
-      load,
-    )
-
-    return () =>
-      window.removeEventListener(
-        'abraxas-portable-updated',
-        load,
-      )
+    Promise.all([
+      backend.listContents(),
+      backend.listBrands(),
+    ])
+      .then(([content, brandList]) => {
+        setContents(content)
+        setBrands(brandList)
+      })
+      .catch(console.error)
   }, [setContents, setBrands])
 
   useEffect(() => {

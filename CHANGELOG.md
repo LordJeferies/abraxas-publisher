@@ -80,3 +80,18 @@ No remote publishing is claimed without remote verification.
 - Dashboard Hoy con manual attention.
 - Queue separa automatic/manual/external.
 - Connected accounts pueden coexistir con redes manuales.
+
+## 0.4.2 · Final shared Desktop/PWA architecture
+
+- Same Supabase project as Editorial OS.
+- `public.editorial_state`.
+- `workspace_key = abraxas-publisher`.
+- Same Supabase Auth across Mac/Web/PWA.
+- Local-first portable Publisher workspace.
+- Realtime synchronization.
+- revision/baseRevision/deviceId conflict contract.
+- Desktop mirrors portable state with native backend.
+- Google Drive Web OAuth based on Abrxs Review.
+- Drive token remains in memory.
+- Desktop keeps native Google Drive OAuth.
+- PWA download button for macOS Desktop.

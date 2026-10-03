@@ -1,0 +1,19 @@
+{
+  "name": "ABRAXAS Publisher",
+  "short_name": "ABRAXAS",
+  "description": "Content operations, review, scheduling and publishing workspace.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f3f5",
+  "theme_color": "#17253c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./abraxas-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

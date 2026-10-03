@@ -22,6 +22,10 @@ import {
 } from '../lib/backend'
 
 import {
+  isTauriRuntime,
+} from '../lib/runtime'
+
+import {
   useAppStore,
 } from '../lib/store'
 
@@ -63,7 +67,11 @@ export function ImportView() {
     useState(fallbackBrand)
 
   const [mode, setMode] =
-    useState<Mode>('local')
+    useState<Mode>(
+      isTauriRuntime()
+        ? 'local'
+        : 'drive',
+    )
 
   const [path, setPath] =
     useState('')
@@ -264,7 +272,9 @@ export function ImportView() {
     async () => {
       if (!clientId.trim()) {
         setError(
-          'Primero introduce el OAuth Client ID de Google tipo Desktop.',
+          isTauriRuntime()
+            ? 'Introduce el OAuth Client ID de Google tipo Desktop.'
+            : 'Introduce el OAuth Client ID Web de Google.',
         )
         return
       }
@@ -472,7 +482,9 @@ export function ImportView() {
           </h1>
 
           <p>
-            Desde este Mac o directamente desde Google Drive.
+            {isTauriRuntime()
+              ? 'Desde este Mac o directamente desde Google Drive.'
+              : 'Desde Google Drive. Las carpetas locales del Mac sólo están disponibles en Desktop.'}
           </p>
         </div>
 
@@ -502,6 +514,7 @@ export function ImportView() {
 
       <div className="source-tabs">
         <button
+          hidden={!isTauriRuntime()}
           className={
             mode === 'local'
               ? 'source-tab active'
@@ -601,7 +614,9 @@ export function ImportView() {
                   </h3>
 
                   <p>
-                    Usa un OAuth Client ID de tipo Desktop. El login se abre en tu navegador, no dentro del WebView.
+                    {isTauriRuntime()
+                      ? 'Usa el OAuth Client ID de tipo Desktop. El login se abre en tu navegador.'
+                      : 'Usa el OAuth Client ID Web público autorizado para https://lordjeferies.github.io.'}
                   </p>
 
                   <input

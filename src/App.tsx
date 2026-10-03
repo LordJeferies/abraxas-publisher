@@ -8,6 +8,7 @@ import { Inspector } from './components/Inspector'
 import { ContentDetail } from './components/ContentDetail'
 import { GlobalProgress } from './components/GlobalProgress'
 import { WelcomeScreen } from './components/WelcomeScreen'
+import { MobileNav } from './components/MobileNav'
 
 import { HomeView } from './views/HomeView'
 import { TodayView } from './views/TodayView'
@@ -28,9 +29,7 @@ import { backend } from './lib/backend'
 import { runProgressTask } from './lib/progress'
 
 function MainView() {
-  const v = useAppStore(
-    (s) => s.view,
-  )
+  const v = useAppStore((s) => s.view)
 
   if (v === 'home') return <HomeView/>
   if (v === 'content') return <ContentView/>
@@ -49,8 +48,7 @@ function MainView() {
 }
 
 export default function App() {
-  const [welcomeOpen, setWelcomeOpen] =
-    useState(true)
+  const [welcomeOpen, setWelcomeOpen] = useState(true)
 
   const {
     contents,
@@ -68,11 +66,10 @@ export default function App() {
       runProgressTask(
         'Preparando Publisher',
         async () => {
-          const [content, brandList] =
-            await Promise.all([
-              backend.listContents(),
-              backend.listBrands(),
-            ])
+          const [content, brandList] = await Promise.all([
+            backend.listContents(),
+            backend.listBrands(),
+          ])
 
           setContents(content)
           setBrands(brandList)
@@ -85,78 +82,47 @@ export default function App() {
 
     load()
 
-    window.addEventListener(
-      'abraxas-portable-updated',
-      load,
-    )
+    window.addEventListener('abraxas-portable-updated', load)
 
     return () =>
-      window.removeEventListener(
-        'abraxas-portable-updated',
-        load,
-      )
+      window.removeEventListener('abraxas-portable-updated', load)
   }, [setContents, setBrands])
 
   useEffect(() => {
-    const handler = async (
-      event: KeyboardEvent,
-    ) => {
+    const handler = async (event: KeyboardEvent) => {
       if (!event.metaKey) return
 
-      if (
-        event.key.toLowerCase() === 'z'
-        && !event.shiftKey
-      ) {
+      if (event.key.toLowerCase() === 'z' && !event.shiftKey) {
         event.preventDefault()
 
         await runProgressTask(
           'Deshaciendo cambio',
           async () => {
             await backend.undo()
-            setContents(
-              await backend.listContents(),
-            )
+            setContents(await backend.listContents())
           },
         )
       }
 
-      if (
-        event.key.toLowerCase() === 'z'
-        && event.shiftKey
-      ) {
+      if (event.key.toLowerCase() === 'z' && event.shiftKey) {
         event.preventDefault()
 
         await runProgressTask(
           'Rehaciendo cambio',
           async () => {
             await backend.redo()
-            setContents(
-              await backend.listContents(),
-            )
+            setContents(await backend.listContents())
           },
         )
       }
     }
 
-    window.addEventListener(
-      'keydown',
-      handler,
-    )
-
-    return () =>
-      window.removeEventListener(
-        'keydown',
-        handler,
-      )
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
   }, [setContents])
 
-  const selected = contents.filter(
-    (c) => selectedIds.includes(c.id),
-  )
-
-  const primary = contents.find(
-    (c) => c.id === selectedId,
-  )
+  const selected = contents.filter((c) => selectedIds.includes(c.id))
+  const primary = contents.find((c) => c.id === selectedId)
 
   const docked =
     selected.length > 0
@@ -182,36 +148,20 @@ export default function App() {
           </main>
         </div>
 
-        {
-          selected.length > 0
-          && inspectorMode !== 'hidden'
-          && (
-            <Inspector
-              items={selected}
-              mode={inspectorMode}
-            />
-          )
-        }
+        {selected.length > 0 && inspectorMode !== 'hidden' && (
+          <Inspector items={selected} mode={inspectorMode}/>
+        )}
       </div>
 
-      {
-        detailOpen
-        && primary
-        && (
-          <ContentDetail
-            item={primary}
-          />
-        )
-      }
+      <MobileNav/>
 
-      {
-        welcomeOpen
-        && (
-          <WelcomeScreen
-            onEnter={() => setWelcomeOpen(false)}
-          />
-        )
-      }
+      {detailOpen && primary && (
+        <ContentDetail item={primary}/>
+      )}
+
+      {welcomeOpen && (
+        <WelcomeScreen onEnter={() => setWelcomeOpen(false)}/>
+      )}
     </>
   )
 }

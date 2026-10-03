@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>ABRAXAS Publisher MCP · Guía pública</title>
+  <style>
+    :root{--bg:#f5f5f7;--panel:rgba(255,255,255,.82);--text:#111114;--muted:#666a73;--line:rgba(17,17,20,.11);--accent:#0a66ff;--good:#1f9d55;--warn:#d97706;--shadow:0 18px 50px rgba(0,0,0,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:linear-gradient(180deg,#fbfbfd 0,#f2f3f5 100%);color:var(--text);line-height:1.55}
+    a{color:inherit}.wrap{max-width:1120px;margin:auto;padding:28px 20px 80px}.hero,.card{background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);backdrop-filter:blur(20px)}
+    .hero{padding:46px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--accent)}h1{font-size:clamp(38px,7vw,74px);line-height:.96;letter-spacing:-.055em;margin:12px 0 18px;max-width:900px}h2{font-size:30px;letter-spacing:-.03em;margin:0 0 14px}h3{margin:0 0 8px;font-size:19px}.lead{font-size:20px;color:var(--muted);max-width:800px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.btn{display:inline-flex;padding:12px 16px;border-radius:999px;text-decoration:none;font-weight:700;border:1px solid var(--line);background:#fff}.btn.primary{background:#111114;color:#fff;border-color:#111114}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card{padding:24px;margin-top:18px}.mini{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.55)}.muted{color:var(--muted)}code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre{overflow:auto;background:#121318;color:#f7f7fa;border-radius:18px;padding:18px;font-size:13px}.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--line)}.step:first-of-type{border-top:0}.n{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#111114;color:#fff;font-weight:800}.pill{display:inline-flex;border-radius:999px;padding:5px 9px;background:#eef4ff;color:#1857b7;font-size:12px;font-weight:800;margin:2px}.warning{border-left:4px solid var(--warn);padding-left:16px}.ok{border-left:4px solid var(--good);padding-left:16px}.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.toc a{text-decoration:none;border:1px solid var(--line);padding:8px 11px;border-radius:999px;background:white;font-size:13px}.case{padding:20px 0;border-top:1px solid var(--line)}.case:first-child{border-top:0}.flow{font-weight:800;color:#242833}.footer{color:var(--muted);font-size:13px;margin-top:28px;text-align:center}@media(max-width:820px){.grid{grid-template-columns:1fr}.hero{padding:30px 22px}.wrap{padding:16px 12px 60px}h1{font-size:44px}}
+  </style>
+</head>
+<body><main class="wrap">
+<section class="hero">
+  <div class="eyebrow">ABRAXAS PUBLISHER · MCP</div>
+  <h1>Controla Publisher desde un agente de IA.</h1>
+  <p class="lead">El MCP conecta ChatGPT, Codex, Claude u otro cliente compatible con el mismo motor real de ABRAXAS Publisher. Puede leer contenido, revisar estados, calendarizar, registrar correcciones, preparar publicaciones y ejecutar herramientas sin crear una base paralela.</p>
+  <div class="actions"><a class="btn primary" href="#instalar">Instalar MCP</a><a class="btn" href="./">Abrir Publisher</a><a class="btn" href="./guide.html">Guía general</a></div>
+  <nav class="toc"><a href="#como-funciona">Cómo funciona</a><a href="#instalar">Instalación</a><a href="#casos">Casos de uso</a><a href="#tools">Herramientas</a><a href="#criterios">Criterios</a><a href="#problemas">Problemas</a></nav>
+</section>
+
+<section id="como-funciona" class="card"><h2>Cómo funciona</h2><p class="muted">La idea es simple: el agente no toca archivos al azar. Llama herramientas MCP que pasan por el bridge Rust y el backend real de Publisher.</p><pre>ChatGPT / Codex / Claude
+        ↓ MCP stdio
+mcp/server.mjs
+        ↓
+publisher_mcp_bridge (Rust)
+        ↓
+Backend de ABRAXAS Publisher
+        ↓
+SQLite · scanner · ffmpeg · publishing</pre>
+<div class="grid"><div class="mini"><h3>Una sola fuente</h3><p class="muted">El MCP usa el mismo workspace y la misma SQLite del Desktop.</p></div><div class="mini"><h3>Sin servidor abierto</h3><p class="muted">Funciona por stdio local. No publica tu base de datos en un puerto HTTP.</p></div><div class="mini"><h3>Con confirmaciones</h3><p class="muted">Las acciones sensibles exigen confirmación explícita.</p></div></div></section>
+
+<section id="instalar" class="card"><h2>Instalación paso a paso</h2>
+<div class="step"><div class="n">1</div><div><h3>Actualiza Publisher</h3><p>Usa el script de reparación/actualización incluido en el repo. Compila la app, instala el MCP y conserva backups.</p></div></div>
+<div class="step"><div class="n">2</div><div><h3>Instala el MCP</h3><pre>cd ~/Developer/abraxas-publisher
+npm run mcp:install</pre><p class="muted">El instalador deja una copia estable en <code>~/.local/share/abraxas-publisher-mcp</code>.</p></div></div>
+<div class="step"><div class="n">3</div><div><h3>Configura tu cliente MCP</h3><pre>{
+  "mcpServers": {
+    "abraxas-publisher": {
+      "command": "node",
+      "args": [
+        "/Users/TU_USUARIO/.local/share/abraxas-publisher-mcp/server.mjs"
+      ],
+      "env": {
+        "ABRAXAS_PUBLISHER_MCP_BRIDGE": "/Users/TU_USUARIO/.local/share/abraxas-publisher-mcp/publisher_mcp_bridge"
+      }
+    }
+  }
+}</pre></div></div>
+<div class="step"><div class="n">4</div><div><h3>Prueba la conexión</h3><p>Pide al agente: <strong>“Usa Publisher MCP y ejecuta el doctor. No cambies nada.”</strong></p></div></div>
+</section>
+
+<section id="casos" class="card"><h2>Casos de uso</h2>
+<div class="case"><h3>1. Revisión diaria</h3><p>Prompt:</p><pre>Revisa Publisher y dime qué necesita atención hoy.
+Separa: con corrección, listo por programar, errores técnicos y trabajos manuales.
+No cambies nada.</pre><p class="flow">Lectura → diagnóstico → resumen.</p></div>
+<div class="case"><h3>2. Dejar una corrección</h3><pre>Abre la ficha “Reel criterio de decisión”.
+Deja la nota: “Cambiar portada por la versión aprobada”.
+Márcala CON_CORRECCION y verifica el resultado.</pre><p class="flow">Buscar ficha → leer → guardar corrección → releer para verificar.</p></div>
+<div class="case"><h3>3. Calendarizar un contenido</h3><pre>Programa el Reel X para Instagram el 8 de octubre a las 5:00 PM.
+No lo marques como programación remota.</pre><p class="flow">Encontrar target → actualizar fecha → verificar calendario.</p></div>
+<div class="case"><h3>4. Preparar una publicación</h3><pre>Prepara el contenido X para Instagram con la cuenta JOC.
+Haz preflight primero y dime si será AUTO, MANUAL o EXTERNAL.
+No encoles nada hasta que te confirme.</pre><p class="flow">Ficha → cuenta → preflight → explicación → confirmación → queue.</p></div>
+<div class="case"><h3>5. Registrar algo programado fuera</h3><pre>Ya programé esta pieza en Meta Business Suite para mañana a las 6 PM.
+Regístralo en Publisher.</pre><p class="flow">Confirmar target/fecha/método → registrar SCHEDULED_EXTERNAL.</p></div>
+<div class="case"><h3>6. Importar una carpeta local</h3><pre>Analiza esta carpeta de contenido y dime primero qué importaría.
+Después de mostrarme conflictos o duplicados, pregúntame antes de importar.</pre><p class="flow">Preview/dry-run → conflictos → confirmación → importación.</p></div>
+<div class="case"><h3>7. Diagnóstico técnico</h3><pre>Ejecuta el doctor de Publisher y revisa SQLite, ffmpeg, ffprobe y estado del workspace.
+No cambies datos.</pre></div>
+<div class="case"><h3>8. Preparar una semana</h3><pre>Revisa los contenidos de JOC de esta semana.
+Agrúpalos por estado, detecta los que faltan calendarizar y propón un plan.
+No escribas nada todavía.</pre></div>
+</section>
+
+<section id="tools" class="card"><h2>Herramientas disponibles</h2>
+<p><span class="pill">publisher_doctor</span><span class="pill">publisher_list_brands</span><span class="pill">publisher_create_brand</span><span class="pill">publisher_list_contents</span><span class="pill">publisher_get_content</span><span class="pill">publisher_refresh_content</span><span class="pill">publisher_import_local</span><span class="pill">publisher_list_activity</span><span class="pill">publisher_undo</span><span class="pill">publisher_redo</span><span class="pill">publisher_dry_run</span></p>
+<p><span class="pill">publisher_set_status</span><span class="pill">publisher_add_correction_note</span><span class="pill">publisher_get_schedule</span><span class="pill">publisher_set_schedule</span><span class="pill">publisher_clear_schedule</span></p>
+<p><span class="pill">publisher_list_accounts</span><span class="pill">publisher_save_account</span><span class="pill">publisher_remove_account</span><span class="pill">publisher_list_jobs</span><span class="pill">publisher_preflight</span><span class="pill">publisher_enqueue_publications</span><span class="pill">publisher_mark_scheduled_external</span></p>
+<p><span class="pill">publisher_get_drive_client_id</span><span class="pill">publisher_set_drive_client_id</span><span class="pill">publisher_open_app</span><span class="pill">publisher_open_web</span></p>
+<div class="warning"><strong>Importante:</strong> Google OAuth sigue siendo interactivo. El MCP no almacena ni roba tokens; cuando haga falta autenticar Drive, abre Publisher y completa el login oficial.</div>
+</section>
+
+<section id="criterios" class="card"><h2>Criterios que debe seguir el agente</h2><ol><li>Leer antes de escribir.</li><li>Verificar después de escribir.</li><li>No inventar IDs de contenido, target o cuenta.</li><li>Si hay varias coincidencias, mostrar las opciones.</li><li>Usar preflight antes de encolar publicaciones.</li><li>Una fecha local no equivale a programación remota.</li><li><code>PROGRAMADO</code> editorial no equivale a <code>SCHEDULED_REMOTE</code>.</li><li><code>MANUAL_REQUIRED</code> no es un error.</li><li>No borrar workspace/cuentas sin confirmación.</li><li>No guardar passwords, service-role keys ni tokens OAuth.</li><li>En lotes grandes, hacer dry-run/preflight primero.</li><li>Después de importar o refrescar, releer y verificar.</li></ol>
+<div class="ok"><strong>Acciones sensibles:</strong> importar local, eliminar cuentas, encolar publicaciones, registrar programación externa y limpiar workspace exigen <code>confirm: true</code>.</div></section>
+
+<section id="problemas" class="card"><h2>Problemas comunes</h2>
+<div class="case"><h3>El cliente no ve Publisher MCP</h3><p>Comprueba que la configuración apunte a <code>~/.local/share/abraxas-publisher-mcp/server.mjs</code> y al bridge de la misma carpeta. Reinicia el cliente MCP después de cambiar su configuración.</p></div>
+<div class="case"><h3>El self-test falla</h3><pre>cd ~/Developer/abraxas-publisher
+npm run mcp:test</pre></div>
+<div class="case"><h3>No encuentra ffmpeg</h3><p>Ejecuta <code>publisher_doctor</code>. En Mac con Homebrew normalmente debe estar en <code>/opt/homebrew/bin/ffmpeg</code>.</p></div>
+<div class="case"><h3>Drive pide login</h3><p>Es normal. Completa OAuth dentro de Publisher. El MCP no debe almacenar esa sesión por su cuenta.</p></div>
+<div class="case"><h3>Quiero publicar automáticamente</h3><p>Primero usa <code>publisher_preflight</code>. Si el provider/API no está realmente disponible, el resultado debe permanecer MANUAL/EXTERNAL, nunca fingir éxito remoto.</p></div>
+</section>
+
+<section class="card"><h2>Modelo mental rápido</h2><pre>“Dime qué hay”       → tools de lectura
+“Cambia esto”        → leer → escribir → verificar
+“Publícalo”          → preflight → confirmar → encolar
+“Ya lo publiqué”     → registrar externo
+“Borra / limpia”     → confirmación explícita</pre>
+<p class="muted">El objetivo del MCP no es saltarse el criterio editorial. Es permitir que un agente opere Publisher con las mismas reglas, estados y motor que la app.</p></section>
+
+<p class="footer">ABRAXAS Publisher · MCP local por stdio · Documentación pública</p>
+</main></body></html>

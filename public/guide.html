@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d12">
+  <title>ABRAXAS Publisher · Qué hace y cómo usarlo</title>
+  <style>
+    :root{
+      --bg:#090b0f;--panel:#11141b;--panel2:#171b24;--line:rgba(255,255,255,.09);
+      --text:#f5f7fb;--muted:#aeb6c6;--accent:#8fb2ff;--good:#8fe3b3;--warn:#ffd27d;
+      --radius:24px;--shadow:0 20px 70px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(circle at top,#111827 0,#090b0f 42%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,system-ui,sans-serif;line-height:1.5}
+    a{color:inherit} .wrap{width:min(1120px,calc(100% - 28px));margin:auto}.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:rgba(9,11,15,.72);border-bottom:1px solid var(--line)}
+    .navin{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;letter-spacing:-.03em}.brand span{color:var(--accent)}.navlinks{display:flex;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;border:1px solid var(--line);border-radius:14px;text-decoration:none;background:rgba(255,255,255,.04);font-weight:650}.btn.primary{background:#f4f7ff;color:#0a0c11;border-color:#f4f7ff}.btn:hover{transform:translateY(-1px)}
+    .hero{padding:76px 0 42px}.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}.hero h1{font-size:clamp(42px,8vw,82px);line-height:.96;letter-spacing:-.055em;margin:14px 0 20px;max-width:900px}.hero p{font-size:clamp(18px,2.4vw,24px);color:var(--muted);max-width:760px;margin:0 0 28px}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}.card h3{margin:0 0 8px;font-size:22px;letter-spacing:-.025em}.card p{margin:0;color:var(--muted)}
+    .pain{grid-column:span 4}.wide{grid-column:span 12}.half{grid-column:span 6}.third{grid-column:span 4}.step{display:flex;gap:14px;align-items:flex-start}.num{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:rgba(143,178,255,.13);color:var(--accent);font-weight:800;flex:0 0 auto}.section{padding:34px 0}.section h2{font-size:clamp(30px,4vw,48px);letter-spacing:-.04em;margin:0 0 8px}.section>.wrap>p{color:var(--muted);max-width:760px;margin-top:0}
+    .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 11px;background:rgba(255,255,255,.04);font-size:14px}.arrow{color:#677083}.good{color:var(--good)}.warn{color:var(--warn)}
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.list{display:grid;gap:9px;margin-top:14px}.row{display:flex;gap:10px;align-items:flex-start;color:var(--muted)}.row b{color:var(--text)}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#080a0e;border:1px solid var(--line);border-radius:16px;padding:14px;overflow:auto;color:#d7def0}
+    details{border-top:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:700}details p{color:var(--muted)}.footer{padding:56px 0 80px;color:var(--muted);text-align:center}
+    @media(max-width:820px){.pain,.half,.third{grid-column:span 12}.compare{grid-template-columns:1fr}.hero{padding-top:48px}.navlinks .hide-mobile{display:none}.card{padding:20px}}
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="wrap navin"><div class="brand">ABRAXAS <span>Publisher</span></div><div class="navlinks"><a class="btn hide-mobile" href="#config">Configurar</a><a class="btn" href="./">Abrir app</a><a class="btn primary" href="https://github.com/LordJeferies/abraxas-publisher/releases/latest/download/ABRAXAS-Publisher-macOS.zip">Descargar Mac</a></div></div></nav>
+
+  <main>
+    <section class="hero"><div class="wrap"><div class="eyebrow">Publishing workspace</div><h1>Organiza, revisa y programa contenido desde Mac o celular.</h1><p>ABRAXAS Publisher centraliza el trabajo que normalmente queda repartido entre carpetas, Drive, notas, calendarios y herramientas de publicación.</p><div class="actions"><a class="btn primary" href="./">Abrir Publisher</a><a class="btn" href="#como-funciona">Ver cómo funciona</a></div></div></section>
+
+    <section class="section"><div class="wrap"><h2>¿Qué problema resuelve?</h2><p>El problema no es crear una pieza. El problema es saber qué pasó con cada pieza cuando tienes muchas marcas, redes y revisiones.</p><div class="grid">
+      <article class="card pain"><h3>Contenido disperso</h3><p>Videos, carruseles, copies y notas terminan repartidos entre Finder, Drive, WhatsApp y documentos.</p></article>
+      <article class="card pain"><h3>No sabes qué está listo</h3><p>Una fecha en calendario no significa necesariamente que la publicación esté aprobada o programada de verdad.</p></article>
+      <article class="card pain"><h3>Publicar se vuelve manual</h3><p>Hay que revisar varias redes, cuentas, formatos y herramientas externas para una misma semana.</p></article>
+      <article class="card pain"><h3>Mac y celular separados</h3><p>Lo revisado en el teléfono no debería obligarte a repetir el trabajo cuando vuelves al Mac.</p></article>
+      <article class="card pain"><h3>Correcciones sin contexto</h3><p>Es fácil perder qué había que corregir, qué archivo cambió y cuál es la versión correcta.</p></article>
+      <article class="card pain"><h3>Demasiadas herramientas</h3><p>Publisher funciona como centro de control aunque la publicación final ocurra por API o en una herramienta externa.</p></article>
+    </div></div></section>
+
+    <section id="como-funciona" class="section"><div class="wrap"><h2>Cómo funciona, en simple</h2><p>Piensa en Publisher como una línea de trabajo.</p><div class="card wide"><div class="flow"><span class="pill">1 · Importar</span><span class="arrow">→</span><span class="pill">2 · Revisar</span><span class="arrow">→</span><span class="pill">3 · Corregir</span><span class="arrow">→</span><span class="pill">4 · Aprobar</span><span class="arrow">→</span><span class="pill">5 · Calendarizar</span><span class="arrow">→</span><span class="pill">6 · Publicar / programar</span></div></div></div></section>
+
+    <section class="section"><div class="wrap"><div class="grid">
+      <article class="card half"><div class="step"><div class="num">1</div><div><h3>Importas contenido</h3><p>Desde el Mac puedes usar carpetas locales o Google Drive. En Web/PWA trabajas principalmente con Drive.</p></div></div></article>
+      <article class="card half"><div class="step"><div class="num">2</div><div><h3>Revisas cada ficha</h3><p>Ves título, marca, formato, assets, copy, notas, redes y estado editorial.</p></div></div></article>
+      <article class="card half"><div class="step"><div class="num">3</div><div><h3>Dejas correcciones</h3><p>Si una pieza necesita cambios, queda marcada como <b>CON_CORRECCION</b> con su nota asociada.</p></div></div></article>
+      <article class="card half"><div class="step"><div class="num">4</div><div><h3>La apruebas</h3><p>Cuando está lista cambia a <b>LISTO_POR_PROGRAMAR</b>. Así el equipo sabe que ya puede entrar al calendario/publicación.</p></div></div></article>
+      <article class="card half"><div class="step"><div class="num">5</div><div><h3>Le asignas fecha</h3><p>Calendario y programación son cosas distintas. Una fecha puede ser sólo planificación hasta que una red confirme la programación.</p></div></div></article>
+      <article class="card half"><div class="step"><div class="num">6</div><div><h3>Eliges cómo se publica</h3><p><span class="good">AUTO</span> por API, <span class="warn">MANUAL</span> cuando debes hacerlo tú, o <b>EXTERNAL</b> si usas Meta Business Suite, YouTube Studio, Buffer, Later, etc.</p></div></div></article>
+    </div></div></section>
+
+    <section class="section"><div class="wrap"><h2>Mac y celular ven el mismo trabajo</h2><p>Los dos usan el mismo workspace en Supabase. No son dos proyectos diferentes.</p><div class="compare">
+      <article class="card"><h3>Web / PWA / iPhone</h3><div class="list"><div class="row">✓ <span>Revisar contenido</span></div><div class="row">✓ <span>Trabajar con Google Drive</span></div><div class="row">✓ <span>Notas y correcciones</span></div><div class="row">✓ <span>Cambiar estados</span></div><div class="row">✓ <span>Calendario y previews</span></div><div class="row">✓ <span>Preparar publicación</span></div></div></article>
+      <article class="card"><h3>Desktop para Mac</h3><div class="list"><div class="row">✓ <span>Todo lo anterior</span></div><div class="row">+ <span>Carpetas y archivos locales</span></div><div class="row">+ <span>SQLite</span></div><div class="row">+ <span>ffmpeg / ffprobe</span></div><div class="row">+ <span>Worker local</span></div><div class="row">+ <span>Integraciones nativas futuras</span></div></div></article>
+    </div></div></section>
+
+    <section class="section"><div class="wrap"><h2>Estados que debes entender</h2><div class="grid">
+      <article class="card third"><h3>EN_CONFIRMACION</h3><p>La pieza todavía debe revisarse o aprobarse.</p></article>
+      <article class="card third"><h3>CON_CORRECCION</h3><p>Hay un cambio pendiente antes de aprobar.</p></article>
+      <article class="card third"><h3>LISTO_POR_PROGRAMAR</h3><p>Ya está aprobada y puede pasar a calendario/publicación.</p></article>
+      <article class="card third"><h3>PROGRAMADO</h3><p>Publisher ya la considera dentro del flujo de programación.</p></article>
+      <article class="card third"><h3>SCHEDULED_REMOTE</h3><p>La plataforma externa confirmó realmente la programación.</p></article>
+      <article class="card third"><h3>SCHEDULED_EXTERNAL</h3><p>Se programó fuera de Publisher y quedó registrado.</p></article>
+    </div></div></section>
+
+    <section class="section"><div class="wrap"><h2>AUTO, MANUAL y EXTERNAL</h2><div class="grid">
+      <article class="card third"><h3>☁ AUTO</h3><p>La cuenta está conectada y la API puede ejecutar la publicación.</p></article>
+      <article class="card third"><h3>✋ MANUAL</h3><p>No hay API disponible o prefieres hacerlo tú. No significa que haya un error.</p></article>
+      <article class="card third"><h3>↗ EXTERNAL</h3><p>La publicación se hace en otra herramienta y Publisher registra el resultado.</p></article>
+    </div></div></section>
+
+    <section id="config" class="section"><div class="wrap"><h2>Configuración inicial</h2><p>La primera vez sólo tienes que conectar las piezas del sistema que vas a usar.</p><div class="grid">
+      <article class="card half"><h3>1. ABRAXAS Cloud</h3><p>Inicia sesión con tu usuario de Supabase. Ese login sincroniza Mac, navegador y PWA.</p><div class="code">Tabla: public.editorial_state\nWorkspace: abraxas-publisher</div></article>
+      <article class="card half"><h3>2. Google Drive</h3><p>En Mac usa el OAuth Desktop. En Web/PWA usa el OAuth Web autorizado para <b>https://lordjeferies.github.io</b>.</p></article>
+      <article class="card half"><h3>3. Crea tus marcas</h3><p>Ejemplo: JOC, Cliente A, Cliente B. Cada contenido queda asociado a una marca.</p></article>
+      <article class="card half"><h3>4. Importa una carpeta o Drive</h3><p>Después de importar, Publisher crea las fichas que pasan al flujo de revisión.</p></article>
+    </div></div></section>
+
+    <section class="section"><div class="wrap"><h2>Google Drive</h2><p>Drive permite que un contenido tenga una referencia común entre Mac y celular. El sistema usa el ID del archivo/carpeta, no depende sólo de un path como <code>/Users/...</code>.</p><div class="card wide"><div class="flow"><span class="pill">Drive</span><span class="arrow">→</span><span class="pill">Publisher</span><span class="arrow">→</span><span class="pill">Supabase</span><span class="arrow">→</span><span class="pill">Mac + iPhone</span></div></div></div></section>
+
+    <section class="section"><div class="wrap"><h2>Problemas comunes</h2><div class="card wide">
+      <details open><summary>Veo la app, pero no aparece lo mismo en el Mac y el teléfono</summary><p>Comprueba que ambos dispositivos hayan iniciado sesión con el mismo usuario de ABRAXAS Cloud/Supabase.</p></details>
+      <details><summary>Drive no abre en iPhone</summary><p>Abre la PWA en Safari y vuelve a conectar Google Drive. Algunos bloqueos de ventanas o sesiones de Google pueden exigir hacerlo desde Safari.</p></details>
+      <details><summary>Una publicación tiene fecha pero no está programada</summary><p>La fecha puede ser sólo planificación. La programación real debe quedar confirmada como SCHEDULED_REMOTE o registrada como SCHEDULED_EXTERNAL.</p></details>
+      <details><summary>¿MANUAL significa error?</summary><p>No. Significa que Publisher preparó la publicación pero la acción final debe hacerse manualmente porque no existe API, no está conectada o has elegido ese modo.</p></details>
+      <details><summary>¿La PWA puede usar archivos locales del Mac?</summary><p>No de la misma forma que Desktop. Para compartir archivos entre dispositivos usa Google Drive o una fuente cloud compatible.</p></details>
+    </div></div></section>
+
+    <section class="section"><div class="wrap"><h2>Empieza aquí</h2><div class="card wide"><h3>Dos accesos</h3><p>Usa la web para trabajar desde cualquier dispositivo. Instala Desktop cuando necesites capacidades locales del Mac.</p><div class="actions" style="margin-top:18px"><a class="btn primary" href="./">Abrir ABRAXAS Publisher</a><a class="btn" href="https://github.com/LordJeferies/abraxas-publisher/releases/latest/download/ABRAXAS-Publisher-macOS.zip">Descargar para Mac</a><a class="btn" href="https://github.com/LordJeferies/abraxas-publisher">Ver repositorio</a></div></div></div></section>
+  </main>
+
+  <footer class="footer"><div class="wrap">ABRAXAS Publisher · Centro de revisión, calendario y publicación de contenido.</div></footer>
+</body>
+</html>

@@ -2,66 +2,78 @@
 
 Trabaja sobre la aplicación existente. No la sustituyas por un mockup.
 
-Stack existente que debe conservarse salvo razón técnica demostrable:
+Stack que debe conservarse salvo razón técnica demostrable:
 
 - Tauri 2
-- React
+- React 19
 - TypeScript
 - Vite
 - Rust
 - SQLite/rusqlite
 - FFmpeg/FFprobe
 - Zustand
-- diseño macOS / Liquid Glass existente
+- Supabase
+- Google Drive OAuth Desktop/Web
+- MCP stdio
 
 ## Reglas críticas
 
-1. Mantener identifier:
-
-   com.abraxas.publisher
-
-2. Mantener compatibilidad/migración de la SQLite existente.
-
+1. Mantener identifier `com.abraxas.publisher`.
+2. Mantener compatibilidad con la SQLite existente.
 3. Nunca borrar datos de usuario para solucionar una migración.
+4. No fingir estados remotos. `SCHEDULED_REMOTE` requiere verificación real del provider.
+5. `PROGRAMADO` editorial no equivale a programación remota.
+6. No almacenar OAuth tokens, passwords, service-role keys ni secretos en Git.
+7. Google Drive OAuth interactivo debe permanecer en la UI apropiada; el MCP no debe robar ni persistir tokens de usuario.
+8. La app debe seguir funcionando aunque Google Drive o una API social no estén configurados.
+9. `CORRECCION.txt` no se interpreta como TXT de red social.
+10. El Kanban es de visualización; el workflow cambia desde la ficha/acciones explícitas.
+11. Desktop y PWA comparten modelo portable, pero paths locales/temporales no se sincronizan como identidad cloud.
+12. El MCP usa el mismo backend/SQLite real de Publisher; no crear una segunda base.
+13. En MCP: leer antes de escribir y verificar después de escribir.
+14. Acciones destructivas/sensibles requieren confirmación explícita.
+15. Para Publishing: ejecutar preflight antes de encolar.
+16. `MANUAL_REQUIRED` no es `FAILED`.
+17. Para operaciones largas, usar la barra global de progreso. No bloquear la UI por defecto.
+18. Si una operación requiere exclusividad, marcarla como bloqueante y mostrar claramente el motivo.
+19. No romper el instalador de macOS ni el acceso `~/Applications/ABRAXAS Publisher.app`.
+20. GitHub Pages se despliega con Actions, pero la creación inicial del site debe realizarla una identidad con permisos admin.
+21. No force push para releases normales.
 
-4. Ninguna API social real se ejecuta en V1.2.
+## QA obligatorio
 
-5. No renombrar un TXT a PROGRAMADO_ salvo confirmación futura de una API real.
+Antes de terminar:
 
-6. No fingir funcionalidades. Si un botón existe, debe ejecutar la función.
+```bash
+npm ci
+npm run check
+npm run build
+GITHUB_ACTIONS=true npm run build:web
+cargo fmt --manifest-path src-tauri/Cargo.toml --all --check
+cargo check --manifest-path src-tauri/Cargo.toml
+cargo test --manifest-path src-tauri/Cargo.toml
+npm run mcp:build
+npm run mcp:selftest
+npm run tauri:build
+```
 
-7. No almacenar OAuth tokens, passwords o secretos en Git.
+## Documentación que debe mantenerse
 
-8. Google Drive debe usar OAuth de aplicación Desktop y navegador del sistema.
-   No incrustar el login de Google dentro del WebView.
+- `README.md`
+- `START_HERE.md`
+- `HANDOFF_AI.md`
+- `CHANGELOG.md`
+- `docs/MCP.md`
+- documentación afectada por cada cambio
 
-9. La app debe seguir funcionando aunque Google Drive no esté configurado.
+## Fuente de verdad
 
-10. La programación local es reversible.
-    Una programación remota futura será irreversible mediante Undo y requerirá
-    cancelación explícita mediante el adapter correspondiente.
+Antes de modificar:
 
-11. CORRECCION.txt no se interpreta como TXT de red social.
+```bash
+git fetch origin
+git status --short
+git log --oneline --decorate -10
+```
 
-12. El Kanban es visual. El estado cambia desde la ficha del contenido.
-
-13. No romper el instalador que ya funciona en este Mac.
-
-14. Antes de terminar:
-    - npm check
-    - frontend build
-    - cargo check
-    - cargo test
-    - tests propios
-    - doctor
-    - build Tauri
-
-15. Actualizar:
-    README.md
-    START_HERE.md
-    HANDOFF_AI.md
-    CHANGELOG.md
-    documentación afectada.
-
-16. No hagas git push ni merge.
-    El script exterior se encarga de Git después de pasar QA.
+Usar `main`/estado más reciente del repo como fuente de verdad, no snapshots antiguos.

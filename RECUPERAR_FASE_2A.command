@@ -13,23 +13,45 @@ BACKUP="$HOME/Applications/ABRAXAS Publisher.pre-v14-recovery-$STAMP.app"
 
 cd "$ROOT"
 
-echo "1/5 · Reparando Sidebar"
+echo "1/5 · Reconstruyendo navegación de Providers"
 python3 <<'PY'
 from pathlib import Path
+
 p = Path('src/components/Sidebar.tsx')
 s = p.read_text()
-# Corrige variantes defectuosas del tuple de providers.
-s = s.replace("    [\n      'providers',\n      'Proveedores',\n      Plug,\n    ],\n", "    [\n      'providers',\n      Plug,\n      'Proveedores',\n    ],\n")
-s = s.replace("    [\n      'providers',\n      Plug,\n      Plug,\n    ],\n", "    [\n      'providers',\n      Plug,\n      'Proveedores',\n    ],\n")
-# Si el bloque existe pero quedó malformado, normalízalo.
-start = s.find("    [\n      'providers',")
-if start != -1:
-    end = s.find("    ],\n", start)
-    if end != -1:
-        end += len("    ],\n")
-        s = s[:start] + "    [\n      'providers',\n      Plug,\n      'Proveedores',\n    ],\n" + s[end:]
-if "  Plug,\n" not in s:
-    s = s.replace("  UsersRound,\n", "  UsersRound,\n  Plug,\n")
+
+if "import type { LucideIcon } from 'lucide-react'" not in s:
+    marker = "} from 'lucide-react'\n"
+    pos = s.find(marker)
+    if pos == -1:
+        raise SystemExit('No se encontró el import principal de lucide-react')
+    pos += len(marker)
+    s = s[:pos] + "\nimport type { LucideIcon } from 'lucide-react'\n" + s[pos:]
+
+old_type = "type Item = [\n  View,\n  typeof House,\n  string,\n]"
+new_type = "type Item = [\n  View,\n  LucideIcon,\n  string,\n]"
+if old_type in s:
+    s = s.replace(old_type, new_type, 1)
+elif "LucideIcon" not in s[s.find('type Item'):s.find('const contentItems')]:
+    raise SystemExit('No se pudo normalizar type Item en Sidebar.tsx')
+
+first_import_end = s.find("} from 'lucide-react'")
+first_import = s[:first_import_end]
+if "  Plug,\n" not in first_import:
+    anchor = "  UsersRound,\n"
+    if anchor not in s:
+        raise SystemExit('No se encontró UsersRound para insertar Plug')
+    s = s.replace(anchor, anchor + "  Plug,\n", 1)
+
+start = s.find('const operationsItems:')
+end = s.find('function NavGroup', start)
+if start == -1 or end == -1:
+    raise SystemExit('No se pudo localizar operationsItems / NavGroup')
+
+operations = """const operationsItems:\n  Item[] = [\n    [\n      'accounts',\n      UsersRound,\n      'Cuentas',\n    ],\n    [\n      'providers',\n      Plug,\n      'Proveedores',\n    ],\n    [\n      'import',\n      Upload,\n      'Importar',\n    ],\n    [\n      'activity',\n      Activity,\n      'Actividad',\n    ],\n    [\n      'sync',\n      RefreshCw,\n      'Sincronización',\n    ],\n  ]\n\n"""
+
+s = s[:start] + operations + s[end:]
+s = s.replace('Publisher · v1.3.2', 'Publisher · v1.4')
 p.write_text(s)
 PY
 

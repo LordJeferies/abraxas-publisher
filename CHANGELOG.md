@@ -15,3 +15,19 @@
 - Instalador de actualización con stage/backup/rollback.
 - Doctor y handoff de repo.
 - Publicación social sigue desactivada.
+
+## 0.3.0 · V1.2 Workspace
+
+- marcas;
+- importación recursiva;
+- duplicados;
+- Drive OAuth directo;
+- calendar Day/Week/Month;
+- multi-network scheduling;
+- inspector dock/float/hide;
+- activity;
+- undo/redo;
+- publisherctl;
+- publisher-mcp;
+- QA automatizado;
+- publicación social real sigue desactivada.

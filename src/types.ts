@@ -1,7 +1,34 @@
-export type Platform = 'instagram' | 'facebook' | 'linkedin' | 'youtube' | string
-export type ContentType = 'reel' | 'video' | 'carousel' | 'image' | 'unknown' | string
-export type WorkflowStatus = 'EN_CONFIRMACION' | 'CON_CORRECCION' | 'LISTO_POR_PROGRAMAR' | 'PROGRAMADO'
-export type ValidationStatus = 'VALID' | 'WARNING' | 'INVALID' | string
+export type Platform =
+  | 'instagram'
+  | 'facebook'
+  | 'linkedin'
+  | 'youtube'
+  | string
+
+export type ContentType =
+  | 'reel'
+  | 'video'
+  | 'carousel'
+  | 'image'
+  | 'unknown'
+  | string
+
+export type WorkflowStatus =
+  | 'EN_CONFIRMACION'
+  | 'CON_CORRECCION'
+  | 'LISTO_POR_PROGRAMAR'
+  | 'PROGRAMADO'
+
+export type ValidationStatus =
+  | 'VALID'
+  | 'WARNING'
+  | 'INVALID'
+  | string
+
+export type InspectorMode =
+  | 'hidden'
+  | 'docked'
+  | 'floating'
 
 export interface MediaAsset {
   id: string
@@ -24,8 +51,17 @@ export interface PublicationTarget {
   scheduleSource?: string | null
 }
 
-export interface ValidationIssue { id: string; severity: 'warning' | 'error' | string; message: string }
-export interface CorrectionNote { id: string; body: string; createdAt: string }
+export interface ValidationIssue {
+  id: string
+  severity: 'warning' | 'error' | string
+  message: string
+}
+
+export interface CorrectionNote {
+  id: string
+  body: string
+  createdAt: string
+}
 
 export interface ContentItem {
   id: string
@@ -39,13 +75,104 @@ export interface ContentItem {
   sourceFingerprint?: string | null
   refreshedAt?: string | null
   latestNote?: CorrectionNote | null
+  sourceKind: string
+  sourceRef?: string | null
   media: MediaAsset[]
   targets: PublicationTarget[]
   issues: ValidationIssue[]
 }
 
-export interface ScanResult { rootPath: string; importedCount: number; contents: ContentItem[]; warnings: number; errors: number }
-export interface RefreshResult { content: ContentItem; changed: boolean; previousVersion: number; currentVersion: number; message: string }
-export interface SimulationPlatform { platform: string; total: number; ready: number; warnings: number; errors: number }
-export interface SimulationReport { totalTargets: number; ready: number; warnings: number; errors: number; generatedAt: string; platforms: SimulationPlatform[]; note: string }
-export interface HealthReport { database: boolean; ffmpeg: boolean; ffprobe: boolean; appDataDir: string }
+export interface Brand {
+  id: string
+  name: string
+  createdAt: string
+}
+
+export interface DuplicateConflict {
+  incomingId: string
+  incomingTitle: string
+  existingId: string
+  existingTitle: string
+  identicalFingerprint: boolean
+}
+
+export interface ImportPreview {
+  rootPath: string
+  contents: ContentItem[]
+  duplicates: DuplicateConflict[]
+  warnings: number
+  errors: number
+}
+
+export interface ScanResult {
+  rootPath: string
+  importedCount: number
+  contents: ContentItem[]
+  warnings: number
+  errors: number
+}
+
+export interface RefreshResult {
+  content: ContentItem
+  changed: boolean
+  previousVersion: number
+  currentVersion: number
+  message: string
+}
+
+export interface ScheduleChange {
+  targetId: string
+  scheduledAt: string | null
+}
+
+export interface ActivityEvent {
+  id: string
+  action: string
+  entityType: string
+  entityId: string
+  label: string
+  beforeJson?: string | null
+  afterJson?: string | null
+  reversible: boolean
+  remote: boolean
+  undone: boolean
+  createdAt: string
+}
+
+export interface DriveItem {
+  id: string
+  name: string
+  mimeType: string
+  isFolder: boolean
+  size?: number | null
+}
+
+export interface DriveAuthResult {
+  connected: boolean
+  message: string
+}
+
+export interface SimulationPlatform {
+  platform: string
+  total: number
+  ready: number
+  warnings: number
+  errors: number
+}
+
+export interface SimulationReport {
+  totalTargets: number
+  ready: number
+  warnings: number
+  errors: number
+  generatedAt: string
+  platforms: SimulationPlatform[]
+  note: string
+}
+
+export interface HealthReport {
+  database: boolean
+  ffmpeg: boolean
+  ffprobe: boolean
+  appDataDir: string
+}

@@ -1,0 +1,16 @@
+#!/bin/bash
+set -Eeuo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+BIN="$ROOT/src-tauri/target/release/publisherctl"
+
+if [ -x "$BIN" ]; then
+  exec "$BIN" "$@"
+fi
+
+exec cargo run \
+  --quiet \
+  --manifest-path "$ROOT/src-tauri/Cargo.toml" \
+  --bin publisherctl \
+  -- "$@"

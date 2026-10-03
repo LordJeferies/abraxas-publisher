@@ -1,7 +1,7 @@
 {
   "name": "abraxas-publisher",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 1420",
@@ -12,6 +12,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/utilities": "^3.2.2",
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.0",
     "@ybouane/liquidglass": "1.0.3",
@@ -25,9 +27,9 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "patch-package": "8.0.1",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0",
-    "patch-package": "8.0.1"
+    "vite": "^6.0.0"
   },
   "engines": {
     "node": ">=20"

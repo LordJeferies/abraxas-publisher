@@ -14,6 +14,7 @@ import {
   UsersRound,
   X,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 import { useAppStore } from '../lib/store'
 import type { View } from '../lib/store'
@@ -21,7 +22,7 @@ import type { View } from '../lib/store'
 type Tab = {
   view: View
   label: string
-  icon: typeof House
+  icon: LucideIcon
 }
 
 const primaryTabs: Tab[] = [

@@ -1,55 +1,167 @@
-# HANDOFF AI — ABRAXAS Publisher v1.1
+# HANDOFF AI — ABRAXAS Publisher
 
-Este archivo existe para que otro chat/IA pueda leer el repositorio y continuar sin depender del historial de conversación.
+Este archivo existe para que otro chat/agente pueda continuar el producto sin depender del historial de conversación.
 
 ## Producto
 
-ABRAXAS Publisher administra grandes lotes de contenido. Cada contenido vive normalmente en una carpeta con medio(s) y uno o más TXT por plataforma. La app importa, valida, permite revisión/corrección, precalendariza y finalmente (Paso 2) publicará en redes.
+ABRAXAS Publisher administra grandes lotes de contenido desde importación hasta publicación/registro externo. Tiene Desktop macOS, Web/PWA y una capa MCP.
 
-## Stack innegociable actual
+## Stack
 
-- Tauri 2 desktop macOS.
-- React + TypeScript + Vite.
-- Rust backend.
-- SQLite local (`rusqlite`, WAL).
-- FFmpeg/ffprobe.
-- LiquidGlass sólo en superficies pequeñas de navegación; no convertir listas/calendario en decenas de WebGL contexts.
-- identifier Tauri: `com.abraxas.publisher`.
+- Tauri 2
+- React 19 + TypeScript + Vite
+- Rust
+- SQLite/rusqlite
+- Supabase Auth + `public.editorial_state`
+- Zustand
+- ffmpeg/ffprobe
+- Google Drive OAuth Desktop + Web
+- MCP stdio sobre bridge Rust
 
-## Estado de v1.1
+Identifier Tauri:
 
-Funciona localmente: import, parser, preview, notas, corrección TXT, hash/mtime refresh, versionado, workflow, Kanban informativo, calendar DnD, unscheduled rail, dry run.
+```text
+com.abraxas.publisher
+```
 
-Publicación real está deliberadamente apagada.
+## Estado de producto
 
-## Principio clave de estados
+Funcionan:
 
-No mezclar validación técnica con workflow editorial.
+- marcas;
+- importación local y Drive;
+- revisión/editorial;
+- notas + `CORRECCION.txt`;
+- refresh/versionado;
+- calendario;
+- Accounts Center;
+- Publishing Center;
+- AUTO_API / MANUAL / EXTERNAL;
+- preflight;
+- publication jobs;
+- SCHEDULED_EXTERNAL;
+- Desktop + PWA sync;
+- MCP;
+- pantalla de bienvenida;
+- barra global de progreso no bloqueante.
 
-- `validationStatus`: VALID / WARNING / INVALID.
-- `status` editorial: EN_CONFIRMACION / CON_CORRECCION / LISTO_POR_PROGRAMAR / PROGRAMADO.
-- `target.status`: READY / PRECALENDARIZED y posteriormente estados remotos del provider.
+## Estados
 
-## Correcciones
+Editorial:
 
-`save_correction_note`:
-1. guarda nota en SQLite;
-2. actualiza estado editorial;
-3. genera `CORRECCION.txt` en la carpeta del contenido mediante temp + rename.
+```text
+EN_CONFIRMACION
+CON_CORRECCION
+LISTO_POR_PROGRAMAR
+PROGRAMADO
+```
 
-`CORRECCION.txt` no se interpreta como TXT de una plataforma.
+Publicación:
 
-## Refresh
+```text
+READY_AUTO
+MANUAL_REQUIRED
+MANUAL_DUE
+MANUAL_OVERDUE
+QUEUED
+DISPATCHING
+VERIFYING
+SCHEDULED_REMOTE
+SCHEDULED_EXTERNAL
+PUBLISHED
+PUBLISHED_EXTERNAL
+FAILED
+```
 
-`refresh_content` reescanea sólo la carpeta de la ficha. Scanner calcula SHA-256 y mtime de medios/TXT, genera `sourceFingerprint`; si cambia, DB incrementa `version`. Al upsert se preservan workflow, notas y horarios existentes.
+No tratar fecha local como confirmación remota.
 
-## Instalación macOS
+## Sync
 
-Nunca asumir cwd del usuario. Todos los scripts usan `SCRIPT_DIR`.
-Destino canónico: `~/Applications/ABRAXAS Publisher.app`.
-Instalador usa stage + backup + swap y conserva App Support/SQLite.
-LiquidGlass 1.0.3 tiene lifecycle `postinstall: patch-package`; root declara `patch-package` para evitar npm 127.
+Proyecto Supabase compartido con Editorial OS.
 
-## Paso 2
+```text
+table: public.editorial_state
+workspace_key: abraxas-publisher
+```
 
-Crear interfaz de providers desacoplada. Empezar conexión individual y validación, no publicación en lote. La publicación del primer lote real es la prueba final.
+Preservar ramas desconocidas del payload y metadatos `revision`, `baseRevision`, `deviceId`, `updatedAt`.
+
+No sincronizar passwords, service-role keys, tokens OAuth privados, rutas locales ni temporales de ffmpeg.
+
+## MCP
+
+Arquitectura:
+
+```text
+MCP client
+→ mcp/server.mjs
+→ publisher_mcp_bridge
+→ mismo Rust/SQLite de Publisher
+```
+
+No crear una segunda base ni una lógica paralela.
+
+Documentación: `docs/MCP.md`.
+
+Acciones sensibles deben requerir confirmación explícita. Drive OAuth interactivo continúa en UI; un agente headless no debe robar/reutilizar tokens del login interactivo.
+
+## UX de operaciones largas
+
+Toda operación que use el estado `loading` debe mostrar la barra global de progreso. La navegación continúa disponible por defecto.
+
+Bloquear la UI sólo cuando la operación necesite exclusividad/integridad; en ese caso mostrar claramente que Publisher está temporalmente bloqueado y por qué.
+
+## GitHub Pages
+
+PWA:
+
+```text
+https://lordjeferies.github.io/abraxas-publisher/
+```
+
+Guide:
+
+```text
+https://lordjeferies.github.io/abraxas-publisher/guide.html
+```
+
+El repo usa `.github/workflows/pages.yml`. La creación inicial del sitio Pages debe hacerla una identidad con permisos admin; el `GITHUB_TOKEN` de Actions no debe usarse para intentar habilitar Pages por primera vez.
+
+## Principios
+
+1. No romper SQLite existente.
+2. No borrar datos de usuario para reparar migraciones.
+3. Reusar el motor actual; no sustituirlo por mockups.
+4. No fingir publicación remota.
+5. No secretos en Git.
+6. No force push para releases normales.
+7. Mantener Desktop y PWA compatibles en modelo de dominio.
+8. Mantener IDs estables; no usar paths locales como identidad cloud.
+9. `CORRECCION.txt` nunca es un TXT de red social.
+10. MCP debe operar el mismo backend real que la app.
+
+## QA
+
+Antes de cerrar cambios:
+
+```bash
+npm ci
+npm run check
+npm run build
+GITHUB_ACTIONS=true npm run build:web
+cargo check --manifest-path src-tauri/Cargo.toml
+cargo test --manifest-path src-tauri/Cargo.toml
+npm run mcp:build
+npm run mcp:selftest
+npm run tauri:build
+```
+
+Leer además:
+
+- `README.md`
+- `START_HERE.md`
+- `AGENTS.md`
+- `docs/MCP.md`
+- `docs/DESKTOP_WEB_PWA_SYNC.md`
+- `docs/GOOGLE_DRIVE.md`
+- `docs/TROUBLESHOOTING.md`

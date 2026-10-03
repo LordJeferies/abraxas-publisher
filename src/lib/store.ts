@@ -7,6 +7,10 @@ import type {
   SimulationReport,
 } from '../types'
 
+import {
+  setLegacyLoading,
+} from './progress'
+
 export type View =
   | 'home'
   | 'today'
@@ -192,6 +196,8 @@ export const useAppStore =
     setSimulation: (simulation) =>
       set({ simulation }),
 
-    setLoading: (loading) =>
-      set({ loading }),
+    setLoading: (loading) => {
+      setLegacyLoading(loading)
+      set({ loading })
+    },
   }))

@@ -1,0 +1,217 @@
+.global-progress{
+  position:fixed;
+  top:max(env(safe-area-inset-top),8px);
+  left:50%;
+  transform:translateX(-50%);
+  width:min(760px,calc(100vw - 24px));
+  z-index:10020;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:10px 12px 12px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;
+  background:rgba(20,24,32,.82);
+  backdrop-filter:blur(22px) saturate(150%);
+  -webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 16px 48px rgba(0,0,0,.22);
+  color:#fff;
+}
+
+.global-progress-copy{
+  display:flex;
+  gap:9px;
+  align-items:center;
+  min-width:0;
+}
+
+.global-progress-copy>div{
+  min-width:0;
+}
+
+.global-progress-copy strong,
+.global-progress-copy small{
+  display:block;
+}
+
+.global-progress-copy strong{
+  font-size:12px;
+}
+
+.global-progress-copy small{
+  margin-top:2px;
+  opacity:.68;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.global-progress>b{
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+}
+
+.global-progress-track{
+  grid-column:1/-1;
+  height:3px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.12);
+}
+
+.global-progress-track span{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:currentColor;
+  transition:width .28s ease;
+}
+
+.global-progress-spinner{
+  animation:abraxas-spin .9s linear infinite;
+  flex:0 0 auto;
+}
+
+@keyframes abraxas-spin{
+  to{transform:rotate(360deg)}
+}
+
+.global-progress-blocker{
+  position:fixed;
+  inset:0;
+  z-index:10010;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(8,10,14,.34);
+  backdrop-filter:blur(4px);
+}
+
+.global-progress-blocker-card{
+  width:min(380px,100%);
+  padding:22px;
+  border-radius:20px;
+  background:rgba(24,28,36,.94);
+  color:white;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+  text-align:center;
+}
+
+.global-progress-blocker-card strong,
+.global-progress-blocker-card p{
+  display:block;
+  margin-top:10px;
+}
+
+.global-progress-blocker-card p{
+  opacity:.72;
+  line-height:1.5;
+}
+
+.welcome-screen{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:grid;
+  place-items:center;
+  padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));
+  overflow:auto;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(110,140,255,.18),transparent 34%),
+    radial-gradient(circle at 80% 90%,rgba(160,110,255,.14),transparent 30%),
+    rgba(12,14,20,.94);
+  backdrop-filter:blur(26px);
+}
+
+.welcome-card{
+  width:min(760px,100%);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:28px;
+  padding:clamp(26px,5vw,54px);
+  background:rgba(255,255,255,.055);
+  box-shadow:0 30px 90px rgba(0,0,0,.28);
+  color:#fff;
+}
+
+.welcome-mark{
+  width:48px;
+  height:48px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  margin-bottom:20px;
+}
+
+.welcome-eyebrow{
+  margin:0 0 8px;
+  font-size:11px;
+  letter-spacing:.18em;
+  opacity:.56;
+}
+
+.welcome-card h1{
+  max-width:660px;
+  margin:0;
+  font-size:clamp(30px,5vw,56px);
+  line-height:1.03;
+  letter-spacing:-.045em;
+}
+
+.welcome-lead{
+  max-width:610px;
+  margin:18px 0 0;
+  font-size:15px;
+  line-height:1.6;
+  opacity:.7;
+}
+
+.welcome-feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:28px 0;
+}
+
+.welcome-feature-grid article{
+  display:grid;
+  gap:8px;
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.welcome-feature-grid span{
+  font-size:12px;
+  line-height:1.45;
+  opacity:.62;
+}
+
+.welcome-enter-button{
+  border:0;
+  border-radius:14px;
+  padding:13px 18px;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.welcome-card>small{
+  display:block;
+  margin-top:14px;
+  opacity:.48;
+  line-height:1.5;
+}
+
+@media(max-width:700px){
+  .welcome-feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  .global-progress{
+    top:max(env(safe-area-inset-top),6px);
+  }
+}

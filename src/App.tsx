@@ -1,9 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
 import { Inspector } from './components/Inspector'
 import { ContentDetail } from './components/ContentDetail'
+import { GlobalProgress } from './components/GlobalProgress'
+import { WelcomeScreen } from './components/WelcomeScreen'
 
 import { HomeView } from './views/HomeView'
 import { TodayView } from './views/TodayView'
@@ -21,6 +23,7 @@ import { SettingsView } from './views/SettingsView'
 
 import { useAppStore } from './lib/store'
 import { backend } from './lib/backend'
+import { runProgressTask } from './lib/progress'
 
 function MainView() {
   const v = useAppStore(
@@ -44,6 +47,9 @@ function MainView() {
 }
 
 export default function App() {
+  const [welcomeOpen, setWelcomeOpen] =
+    useState(true)
+
   const {
     contents,
     setContents,
@@ -56,17 +62,24 @@ export default function App() {
   } = useAppStore()
 
   useEffect(() => {
-    const load = () => {
-      Promise.all([
-        backend.listContents(),
-        backend.listBrands(),
-      ])
-        .then(([content, brandList]) => {
+    const load = () =>
+      runProgressTask(
+        'Preparando Publisher',
+        async () => {
+          const [content, brandList] =
+            await Promise.all([
+              backend.listContents(),
+              backend.listBrands(),
+            ])
+
           setContents(content)
           setBrands(brandList)
-        })
-        .catch(console.error)
-    }
+        },
+        {
+          detail: 'Cargando contenido y marcas',
+          blocking: false,
+        },
+      ).catch(console.error)
 
     load()
 
@@ -94,9 +107,14 @@ export default function App() {
       ) {
         event.preventDefault()
 
-        await backend.undo()
-        setContents(
-          await backend.listContents(),
+        await runProgressTask(
+          'Deshaciendo cambio',
+          async () => {
+            await backend.undo()
+            setContents(
+              await backend.listContents(),
+            )
+          },
         )
       }
 
@@ -106,9 +124,14 @@ export default function App() {
       ) {
         event.preventDefault()
 
-        await backend.redo()
-        setContents(
-          await backend.listContents(),
+        await runProgressTask(
+          'Rehaciendo cambio',
+          async () => {
+            await backend.redo()
+            setContents(
+              await backend.listContents(),
+            )
+          },
         )
       }
     }
@@ -139,6 +162,8 @@ export default function App() {
 
   return (
     <>
+      <GlobalProgress/>
+
       <div
         className={
           docked
@@ -173,6 +198,15 @@ export default function App() {
         && (
           <ContentDetail
             item={primary}
+          />
+        )
+      }
+
+      {
+        welcomeOpen
+        && (
+          <WelcomeScreen
+            onEnter={() => setWelcomeOpen(false)}
           />
         )
       }

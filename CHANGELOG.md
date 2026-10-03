@@ -68,3 +68,15 @@
 
 No provider is considered connected without verified auth.
 No remote publishing is claimed without remote verification.
+
+## 0.4.1 · V1.3.1 Hybrid Publishing
+
+- AUTO_API / MANUAL / EXTERNAL por PublicationTarget.
+- Sin API ya no bloquea preflight.
+- MANUAL_REQUIRED.
+- MANUAL_DUE.
+- MANUAL_OVERDUE.
+- Mixed batch confirmation.
+- Dashboard Hoy con manual attention.
+- Queue separa automatic/manual/external.
+- Connected accounts pueden coexistir con redes manuales.

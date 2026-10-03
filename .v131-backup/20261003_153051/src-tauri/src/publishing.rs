@@ -96,18 +96,7 @@ pub struct PreflightReport {
     pub target_id: String,
     pub account_id: Option<String>,
     pub provider: String,
-
-    // true = el target puede continuar.
-    // Un target MANUAL también puede estar ready.
     pub ready: bool,
-
-    // AUTO_API | MANUAL
-    pub execution_mode: String,
-
-    // true si Publisher debe recordar al usuario
-    // que la publicación necesita intervención humana.
-    pub needs_manual_action: bool,
-
     pub checks: Vec<PreflightCheck>,
 }
 
@@ -398,7 +387,14 @@ pub fn preflight(
 ) -> Result<PreflightReport, String> {
     let conn = open(db)?;
 
-    let target: Option<(String, String, String, Option<String>, String)> = conn
+    let target: Option<(
+        String,
+        String,
+        String,
+        Option<String>,
+        String,
+        Option<String>,
+    )> = conn
         .query_row(
             r#"
             SELECT
@@ -406,19 +402,31 @@ pub fn preflight(
               p.platform,
               p.status,
               p.scheduled_at,
-              c.workflow_status
+              c.workflow_status,
+              c.source_fingerprint
             FROM publication_targets p
             JOIN contents c
               ON c.id=p.content_id
             WHERE p.id=?1
             "#,
             params![target_id],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)),
+            |r| {
+                Ok((
+                    r.get(0)?,
+                    r.get(1)?,
+                    r.get(2)?,
+                    r.get(3)?,
+                    r.get(4)?,
+                    r.get(5)?,
+                ))
+            },
         )
         .optional()
         .map_err(|e| e.to_string())?;
 
-    let Some((content_id, provider, target_status, scheduled_at, editorial_status)) = target else {
+    let Some((content_id, provider, target_status, scheduled_at, editorial_status, _fingerprint)) =
+        target
+    else {
         return Err("Destino no encontrado.".into());
     };
 
@@ -430,29 +438,16 @@ pub fn preflight(
         )
         .map_err(|e| e.to_string())?;
 
-    let blocking_issue_count: i64 = conn
-        .query_row(
-            r#"
-            SELECT COUNT(*)
-            FROM validation_issues
-            WHERE content_id=?1
-              AND LOWER(severity)='error'
-            "#,
-            params![content_id],
-            |r| r.get(0),
-        )
-        .map_err(|e| e.to_string())?;
-
     let account = if let Some(id) = account_id {
         conn.query_row(
             r#"
-            SELECT
-              provider,
-              connection_status,
-              auth_state
-            FROM connected_accounts
-            WHERE id=?1
-            "#,
+                SELECT
+                  provider,
+                  connection_status,
+                  auth_state
+                FROM connected_accounts
+                WHERE id=?1
+                "#,
             params![id],
             |r| {
                 Ok((
@@ -467,18 +462,6 @@ pub fn preflight(
     } else {
         None
     };
-
-    let auto_api = match &account {
-        Some((account_provider, connection_status, auth_state)) => {
-            account_provider == &provider
-                && connection_status == "CONNECTED"
-                && auth_state == "AUTHORIZED"
-        }
-
-        None => false,
-    };
-
-    let execution_mode = if auto_api { "AUTO_API" } else { "MANUAL" };
 
     let mut checks = Vec::new();
 
@@ -502,18 +485,6 @@ pub fn preflight(
     });
 
     checks.push(PreflightCheck {
-        key: "validation".into(),
-        label: "Sin errores técnicos bloqueantes".into(),
-        ok: blocking_issue_count == 0,
-        blocking: true,
-        detail: Some(if blocking_issue_count == 0 {
-            "Sin errores".into()
-        } else {
-            format!("{blocking_issue_count} error(es)")
-        }),
-    });
-
-    checks.push(PreflightCheck {
         key: "schedule".into(),
         label: "Fecha/hora definida".into(),
         ok: scheduled_at.is_some(),
@@ -521,72 +492,47 @@ pub fn preflight(
         detail: scheduled_at.clone(),
     });
 
-    let editable = target_status != "SCHEDULED_REMOTE"
-        && target_status != "SCHEDULED_EXTERNAL"
-        && target_status != "PUBLISHED"
-        && target_status != "PUBLISHED_EXTERNAL";
-
     checks.push(PreflightCheck {
         key: "remote-lock".into(),
-        label: "Destino disponible".into(),
-        ok: editable,
+        label: "Destino editable".into(),
+        ok: target_status != "SCHEDULED_REMOTE" && target_status != "PUBLISHED",
         blocking: true,
         detail: Some(target_status.clone()),
     });
 
-    /*
-     * IMPORTANTE:
-     *
-     * Cuenta API no conectada NO es un error.
-     *
-     * Convierte el target a MANUAL.
-     */
-    let account_detail = match account {
-        Some((account_provider, connection_status, auth_state)) => Some(format!(
-            "{} · {} · {}",
-            account_provider, connection_status, auth_state
-        )),
+    let (account_ok, account_detail) = match account {
+        Some((account_provider, connection_status, auth_state)) => {
+            let ok = account_provider == provider
+                && connection_status == "CONNECTED"
+                && auth_state == "AUTHORIZED";
 
-        None => Some("Sin API conectada · publicación manual".into()),
+            (
+                ok,
+                Some(format!(
+                    "{} · {} · {}",
+                    account_provider, connection_status, auth_state
+                )),
+            )
+        }
+
+        None => (false, Some("Sin cuenta API conectada".into())),
     };
 
     checks.push(PreflightCheck {
         key: "account".into(),
-
-        label: if auto_api {
-            "API lista para publicación automática".into()
-        } else {
-            "Publicación manual necesaria".into()
-        },
-
-        // true significa:
-        // el workflow tiene solución válida.
-        ok: true,
-
-        // jamás bloquea sólo por faltar API.
-        blocking: false,
-
+        label: "Cuenta y autorización válidas".into(),
+        ok: account_ok,
+        blocking: true,
         detail: account_detail,
     });
 
-    let ready = checks
-        .iter()
-        .filter(|check| check.blocking)
-        .all(|check| check.ok);
+    let ready = checks.iter().filter(|x| x.blocking).all(|x| x.ok);
 
     Ok(PreflightReport {
         target_id: target_id.into(),
-
         account_id: account_id.map(|x| x.into()),
-
         provider,
-
         ready,
-
-        execution_mode: execution_mode.into(),
-
-        needs_manual_action: !auto_api,
-
         checks,
     })
 }
@@ -620,33 +566,13 @@ pub fn enqueue(db: &Path, inputs: &[EnqueueInput]) -> Result<Vec<PublishJob>, St
             continue;
         };
 
-        let mode = match input.mode.as_str() {
-            "AUTO_API" => "AUTO_API",
-
-            "MANUAL" => "MANUAL",
-
-            "EXTERNAL" => "EXTERNAL",
-
-            _ => "MANUAL",
-        };
-
-        let initial_status = match mode {
-            "AUTO_API" => "QUEUED",
-
-            "MANUAL" => "MANUAL_REQUIRED",
-
-            "EXTERNAL" => "SCHEDULED_EXTERNAL",
-
-            _ => "MANUAL_REQUIRED",
-        };
-
         let identity = format!(
             "{}:{}:{}:{}:{}",
             input.target_id,
             input.account_id.clone().unwrap_or_default(),
             scheduled_for.clone().unwrap_or_default(),
             fingerprint.unwrap_or_default(),
-            mode,
+            input.mode,
         );
 
         let idempotency_key = hash_id(&identity);
@@ -655,42 +581,19 @@ pub fn enqueue(db: &Path, inputs: &[EnqueueInput]) -> Result<Vec<PublishJob>, St
 
         conn.execute(
             r#"
-            INSERT INTO publication_jobs(
-              id,
-              target_id,
-              content_id,
-              provider,
-              account_id,
-              mode,
-              scheduled_for,
-              status,
+            INSERT OR IGNORE INTO publication_jobs(
+              id,target_id,content_id,
+              provider,account_id,mode,
+              scheduled_for,status,
               idempotency_key,
-              attempt,
-              max_attempts,
-              created_at,
-              updated_at
+              attempt,max_attempts,
+              created_at,updated_at
             )
             VALUES(
               ?1,?2,?3,?4,?5,?6,
-              ?7,?8,?9,
-              0,4,?10,?11
+              ?7,'QUEUED',
+              ?8,0,4,?9,?10
             )
-            ON CONFLICT(idempotency_key)
-            DO UPDATE SET
-              account_id=excluded.account_id,
-              mode=excluded.mode,
-              scheduled_for=excluded.scheduled_for,
-              status=CASE
-                WHEN publication_jobs.status IN (
-                  'PUBLISHED',
-                  'PUBLISHED_EXTERNAL',
-                  'SCHEDULED_REMOTE',
-                  'SCHEDULED_EXTERNAL'
-                )
-                THEN publication_jobs.status
-                ELSE excluded.status
-              END,
-              updated_at=excluded.updated_at
             "#,
             params![
                 id,
@@ -698,9 +601,8 @@ pub fn enqueue(db: &Path, inputs: &[EnqueueInput]) -> Result<Vec<PublishJob>, St
                 content_id,
                 provider,
                 input.account_id,
-                mode,
+                input.mode,
                 scheduled_for,
-                initial_status,
                 idempotency_key,
                 now,
                 now,

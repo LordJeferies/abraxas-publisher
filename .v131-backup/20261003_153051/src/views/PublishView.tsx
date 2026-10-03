@@ -3,9 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleAlert,
-  Cloud,
   ExternalLink,
-  Hand,
   Send,
 } from 'lucide-react'
 
@@ -38,7 +36,6 @@ export function PublishView() {
     contents,
     selectedBrand,
     setContents,
-    setView,
   } = useAppStore()
 
   const [
@@ -67,18 +64,6 @@ export function PublishView() {
   ] =
     useState<
       Record<string,string>
-    >({})
-
-  const [
-    forceMode,
-    setForceMode,
-  ] =
-    useState<
-      Record<
-        string,
-        'AUTO'
-        | 'MANUAL'
-      >
     >({})
 
   const [
@@ -170,24 +155,19 @@ export function PublishView() {
       id: string,
     ) => {
       setSelectedTargets(
-        (previous) =>
-          previous.includes(id)
-            ? previous.filter(
+        (prev) =>
+          prev.includes(id)
+            ? prev.filter(
                 (x) => x !== id,
               )
-            : [
-                ...previous,
-                id,
-              ],
+            : [...prev,id],
       )
     }
 
   const compatibleAccounts =
     (
-      target:
-        PublicationTarget,
-      brand?:
-        string | null,
+      target: PublicationTarget,
+      brand?: string | null,
     ) =>
       accounts.filter(
         (account) =>
@@ -200,54 +180,6 @@ export function PublishView() {
               === brand
           ),
       )
-
-  const accountIsAutomatic =
-    (
-      target:
-        PublicationTarget,
-    ) => {
-      const accountId =
-        accountFor[
-          target.id
-        ]
-
-      const account =
-        accounts.find(
-          (item) =>
-            item.id
-            === accountId,
-        )
-
-      return Boolean(
-        account
-        && account.provider
-          === target.platform
-        && account.connectionStatus
-          === 'CONNECTED'
-        && account.authState
-          === 'AUTHORIZED',
-      )
-    }
-
-  const intendedMode =
-    (
-      target:
-        PublicationTarget,
-    ) => {
-      if (
-        forceMode[
-          target.id
-        ] === 'MANUAL'
-      ) {
-        return 'MANUAL'
-      }
-
-      return accountIsAutomatic(
-        target,
-      )
-        ? 'AUTO_API'
-        : 'MANUAL'
-    }
 
   const runPreflight =
     async () => {
@@ -263,54 +195,21 @@ export function PublishView() {
         }
         of selected
       ) {
-        /*
-         * Si el usuario obliga Manual,
-         * no pasamos la cuenta API.
-         */
-        const accountId =
-          forceMode[
-            target.id
-          ] === 'MANUAL'
-            ? null
-            : (
-                accountFor[
-                  target.id
-                ]
-                || null
-              )
-
-        const report =
+        next[target.id] =
           await backend
             .publishingPreflight(
               target.id,
-              accountId,
+              accountFor[
+                target.id
+              ]
+              || null,
             )
-
-        if (
-          forceMode[
-            target.id
-          ] === 'MANUAL'
-        ) {
-          report.executionMode =
-            'MANUAL'
-
-          report.needsManualAction =
-            true
-        }
-
-        next[target.id] =
-          report
       }
 
       setPreflight(next)
       setStep(3)
     }
 
-  /*
-   * Sólo bloqueamos por problemas reales.
-   *
-   * Una publicación MANUAL puede estar ready.
-   */
   const allReady =
     selected.length > 0
     && selected.every(
@@ -320,28 +219,11 @@ export function PublishView() {
         ]?.ready,
     )
 
-  const autoCount =
-    selected.filter(
-      ({ target }) =>
-        (
-          preflight[
-            target.id
-          ]?.executionMode
-          || intendedMode(
-            target,
-          )
-        ) === 'AUTO_API',
-    ).length
-
-  const manualCount =
-    selected.length
-    - autoCount
-
   const enqueue =
     async () => {
       if (!allReady) {
         setMessage(
-          'Hay destinos bloqueados por problemas reales de contenido o calendario.',
+          'Hay destinos bloqueados por el preflight.',
         )
 
         return
@@ -353,35 +235,19 @@ export function PublishView() {
             ({ target }) => ({
               targetId:
                 target.id,
-
               accountId:
-                (
-                  preflight[
-                    target.id
-                  ]?.executionMode
-                  === 'AUTO_API'
-                )
-                  ? (
-                      accountFor[
-                        target.id
-                      ]
-                      || null
-                    )
-                  : null,
-
-              mode:
-                preflight[
+                accountFor[
                   target.id
-                ]?.executionMode
-                || intendedMode(
-                  target,
-                ),
+                ]
+                || null,
+              mode:
+                'SCHEDULE',
             }),
           ),
         )
 
       setMessage(
-        `${autoCount} automática(s) · ${manualCount} manual(es) añadidas a la cola.`,
+        `${selected.length} destino(s) añadidos a la cola.`,
       )
 
       setStep(5)
@@ -419,7 +285,7 @@ export function PublishView() {
       )
 
       setMessage(
-        `SCHEDULED_EXTERNAL · ${externalMethod}`,
+        `Marcado como SCHEDULED_EXTERNAL · ${externalMethod}`,
       )
     }
 
@@ -451,7 +317,7 @@ export function PublishView() {
           </h1>
 
           <p>
-            Automático cuando hay API. Manual asistido cuando no la hay.
+            Selecciona → destinos → preflight → preview → cola.
           </p>
         </div>
 
@@ -459,20 +325,6 @@ export function PublishView() {
           {step}/5
         </div>
       </header>
-
-      <div className="hybrid-info-banner">
-        <Cloud size={16}/>
-
-        <div>
-          <strong>
-            Publicación híbrida
-          </strong>
-
-          <span>
-            No necesitas tener todas las APIs conectadas. Publisher automatiza las disponibles y mantiene el resto como tareas manuales.
-          </span>
-        </div>
-      </div>
 
       <div className="wizard-steps">
         {
@@ -483,10 +335,7 @@ export function PublishView() {
             'Preview',
             'Confirmar',
           ].map(
-            (
-              label,
-              index,
-            ) => (
+            (label,index) => (
               <div
                 className={
                   step === index + 1
@@ -515,11 +364,11 @@ export function PublishView() {
             <div className="stage-title">
               <div>
                 <h2>
-                  ¿Qué vas a publicar?
+                  ¿Qué vas a programar?
                 </h2>
 
                 <p>
-                  Selecciona destinos individuales. Una misma pieza puede ser automática en una red y manual en otra.
+                  Sólo aparece contenido editorialmente listo.
                 </p>
               </div>
 
@@ -547,10 +396,9 @@ export function PublishView() {
                   }) => (
                     <label
                       className={
-                        selectedTargets
-                          .includes(
-                            target.id,
-                          )
+                        selectedTargets.includes(
+                          target.id,
+                        )
                           ? 'publish-select-row selected'
                           : 'publish-select-row'
                       }
@@ -559,10 +407,9 @@ export function PublishView() {
                       <input
                         type="checkbox"
                         checked={
-                          selectedTargets
-                            .includes(
-                              target.id,
-                            )
+                          selectedTargets.includes(
+                            target.id,
+                          )
                         }
                         onChange={() =>
                           toggle(
@@ -621,11 +468,11 @@ export function PublishView() {
             <div className="stage-title">
               <div>
                 <h2>
-                  ¿Cómo sale cada publicación?
+                  Cuentas de destino
                 </h2>
 
                 <p>
-                  La falta de API no bloquea el workflow.
+                  Una cuenta distinta puede usarse por cada red.
                 </p>
               </div>
             </div>
@@ -642,14 +489,6 @@ export function PublishView() {
                         target,
                         content.client,
                       )
-
-                    const automatic =
-                      accountIsAutomatic(
-                        target,
-                      )
-                      && forceMode[
-                        target.id
-                      ] !== 'MANUAL'
 
                     return (
                       <article
@@ -683,140 +522,61 @@ export function PublishView() {
                           </span>
                         </div>
 
-                        <div className="destination-account-stack">
-                          <select
-                            className="field"
-                            value={
-                              accountFor[
-                                target.id
-                              ]
-                              || ''
-                            }
-                            onChange={(e) =>
-                              setAccountFor(
-                                (previous) => ({
-                                  ...previous,
-                                  [
-                                    target.id
-                                  ]:
-                                    e.target.value,
-                                }),
-                              )
-                            }
-                          >
-                            <option value="">
-                              Sin API · manual
-                            </option>
-
-                            {
-                              compatible.map(
-                                (account) => (
-                                  <option
-                                    value={
-                                      account.id
-                                    }
-                                    key={
-                                      account.id
-                                    }
-                                  >
-                                    {
-                                      account.displayName
-                                    }
-                                    {' · '}
-                                    {
-                                      account.connectionStatus
-                                    }
-                                  </option>
-                                ),
-                              )
-                            }
-                          </select>
-
-                          <div
-                            className={
-                              automatic
-                                ? 'execution-mode auto'
-                                : 'execution-mode manual'
-                            }
-                          >
-                            {
-                              automatic
-                                ? (
-                                  <>
-                                    <Cloud size={13}/>
-                                    AUTO_API
-                                  </>
-                                )
-                                : (
-                                  <>
-                                    <Hand size={13}/>
-                                    MANUAL
-                                  </>
-                                )
-                            }
-                          </div>
-                        </div>
-
-                        <div className="destination-actions">
-                          {
-                            automatic
-                            && (
-                              <button
-                                className="secondary-btn small"
-                                onClick={() =>
-                                  setForceMode(
-                                    (previous) => ({
-                                      ...previous,
-                                      [
-                                        target.id
-                                      ]:
-                                        'MANUAL',
-                                    }),
-                                  )
-                                }
-                              >
-                                Hacer manual
-                              </button>
+                        <select
+                          className="field"
+                          value={
+                            accountFor[
+                              target.id
+                            ]
+                            || ''
+                          }
+                          onChange={(e) =>
+                            setAccountFor(
+                              (prev) => ({
+                                ...prev,
+                                [
+                                  target.id
+                                ]:
+                                  e.target.value,
+                              }),
                             )
                           }
+                        >
+                          <option value="">
+                            Seleccionar cuenta
+                          </option>
 
                           {
-                            !automatic
-                            && accountIsAutomatic(
-                              target,
-                            )
-                            && (
-                              <button
-                                className="secondary-btn small"
-                                onClick={() =>
-                                  setForceMode(
-                                    (previous) => ({
-                                      ...previous,
-                                      [
-                                        target.id
-                                      ]:
-                                        'AUTO',
-                                    }),
-                                  )
-                                }
-                              >
-                                Usar API
-                              </button>
+                            compatible.map(
+                              (account) => (
+                                <option
+                                  value={account.id}
+                                  key={account.id}
+                                >
+                                  {
+                                    account.displayName
+                                  }
+                                  {' · '}
+                                  {
+                                    account.connectionStatus
+                                  }
+                                </option>
+                              ),
                             )
                           }
+                        </select>
 
-                          <button
-                            className="secondary-btn small"
-                            onClick={() =>
-                              markExternal(
-                                target.id,
-                              )
-                            }
-                          >
-                            <ExternalLink size={14}/>
-                            Ya programado fuera
-                          </button>
-                        </div>
+                        <button
+                          className="secondary-btn small"
+                          onClick={() =>
+                            markExternal(
+                              target.id,
+                            )
+                          }
+                        >
+                          <ExternalLink size={14}/>
+                          Programado fuera
+                        </button>
                       </article>
                     )
                   },
@@ -826,14 +586,12 @@ export function PublishView() {
 
             <div className="external-method-row">
               <span>
-                Scheduler externo:
+                Si fue programado fuera:
               </span>
 
               <select
                 className="field"
-                value={
-                  externalMethod
-                }
+                value={externalMethod}
                 onChange={(e) =>
                   setExternalMethod(
                     e.target.value,
@@ -843,31 +601,18 @@ export function PublishView() {
                 <option>
                   Edits
                 </option>
-
                 <option>
                   Meta Business Suite
                 </option>
-
                 <option>
                   YouTube Studio
                 </option>
-
                 <option>
                   LinkedIn
                 </option>
-
                 <option>
                   TikTok
                 </option>
-
-                <option>
-                  Buffer
-                </option>
-
-                <option>
-                  Later
-                </option>
-
                 <option>
                   Otra herramienta
                 </option>
@@ -888,30 +633,8 @@ export function PublishView() {
                 </h2>
 
                 <p>
-                  Amarillo significa manual. Rojo sólo significa bloqueo real.
+                  Ningún job sale a una API sin pasar esta fase.
                 </p>
-              </div>
-            </div>
-
-            <div className="hybrid-counts">
-              <div>
-                <Cloud/>
-                <strong>
-                  {autoCount}
-                </strong>
-                <span>
-                  Automáticas
-                </span>
-              </div>
-
-              <div>
-                <Hand/>
-                <strong>
-                  {manualCount}
-                </strong>
-                <span>
-                  Manuales
-                </span>
               </div>
             </div>
 
@@ -927,19 +650,12 @@ export function PublishView() {
                         target.id
                       ]
 
-                    const manual =
-                      report
-                        ?.executionMode
-                      === 'MANUAL'
-
                     return (
                       <article
                         className={
-                          !report?.ready
-                            ? 'preflight-card blocked'
-                            : manual
-                              ? 'preflight-card manual-ready'
-                              : 'preflight-card ready'
+                          report?.ready
+                            ? 'preflight-card ready'
+                            : 'preflight-card blocked'
                         }
                         key={target.id}
                       >
@@ -959,80 +675,47 @@ export function PublishView() {
                           </div>
 
                           {
-                            !report?.ready
-                              ? (
-                                <CircleAlert/>
-                              )
-                              : manual
-                                ? (
-                                  <Hand/>
-                                )
-                                : (
-                                  <CheckCircle2/>
-                                )
+                            report?.ready
+                              ? <CheckCircle2/>
+                              : <CircleAlert/>
                           }
                         </header>
 
-                        <div
-                          className={
-                            manual
-                              ? 'execution-callout manual'
-                              : 'execution-callout auto'
-                          }
-                        >
-                          {
-                            manual
-                              ? '✋ LISTO · PUBLICACIÓN MANUAL'
-                              : '☁ LISTO · PUBLICACIÓN AUTOMÁTICA'
-                          }
-                        </div>
-
                         {
-                          report?.checks
-                            .map(
-                              (check) => (
-                                <div
-                                  className={
+                          report?.checks.map(
+                            (check) => (
+                              <div
+                                className={
+                                  check.ok
+                                    ? 'preflight-check ok'
+                                    : 'preflight-check fail'
+                                }
+                                key={check.key}
+                              >
+                                <span>
+                                  {
                                     check.ok
-                                      ? 'preflight-check ok'
-                                      : (
-                                          check.blocking
-                                            ? 'preflight-check fail'
-                                            : 'preflight-check warning'
-                                        )
+                                      ? '✓'
+                                      : '✕'
                                   }
-                                  key={
-                                    check.key
-                                  }
-                                >
-                                  <span>
+                                </span>
+
+                                <div>
+                                  <strong>
                                     {
-                                      check.ok
-                                        ? '✓'
-                                        : (
-                                            check.blocking
-                                              ? '✕'
-                                              : '!'
-                                          )
+                                      check.label
                                     }
-                                  </span>
+                                  </strong>
 
-                                  <div>
-                                    <strong>
-                                      {
-                                        check.label
-                                      }
-                                    </strong>
-
-                                    <small>
-                                      {
-                                        check.detail
-                                      }
-                                    </small>
-                                  </div>
+                                  <small>
+                                    {
+                                      check.detail
+                                    }
+                                  </small>
                                 </div>
-                              ),
-                            )
+                              </div>
+                            ),
+                          )
                         }
                       </article>
                     )
@@ -1057,8 +740,7 @@ export function PublishView() {
                   }) => (
                     <button
                       className={
-                        previewEntry
-                          ?.target.id
+                        previewEntry?.target.id
                         === target.id
                           ? 'active'
                           : ''
@@ -1081,17 +763,6 @@ export function PublishView() {
                           content.title
                         }
                       </span>
-
-                      <small>
-                        {
-                          preflight[
-                            target.id
-                          ]?.executionMode
-                          === 'AUTO_API'
-                            ? '☁ Automático'
-                            : '✋ Manual'
-                        }
-                      </small>
                     </button>
                   ),
                 )
@@ -1111,30 +782,24 @@ export function PublishView() {
 
                         <h2>
                           {
-                            previewEntry
-                              .target
-                              .platform
+                            previewEntry.target.platform
                           }
                         </h2>
                       </div>
 
                       <div className="preview-type-badge">
                         {
-                          previewEntry
-                            .content
-                            .contentType
+                          previewEntry.content.contentType
                         }
                       </div>
                     </div>
 
                     <PlatformPreview
                       item={
-                        previewEntry
-                          .content
+                        previewEntry.content
                       }
                       target={
-                        previewEntry
-                          .target
+                        previewEntry.target
                       }
                     />
                   </>
@@ -1150,40 +815,18 @@ export function PublishView() {
         && (
           <section className="publish-stage confirmation-stage">
             <span className="eyebrow">
-              CONFIRMAR LOTE
+              CONFIRMAR
             </span>
 
             <h2>
               {
                 selected.length
-              } destinos
+              } publicación(es)
             </h2>
 
-            <div className="hybrid-confirm-summary">
-              <div className="auto">
-                <Cloud size={22}/>
-
-                <strong>
-                  {autoCount}
-                </strong>
-
-                <span>
-                  Publisher se encargará automáticamente
-                </span>
-              </div>
-
-              <div className="manual">
-                <Hand size={22}/>
-
-                <strong>
-                  {manualCount}
-                </strong>
-
-                <span>
-                  Permanecerán en tu agenda para publicación manual
-                </span>
-              </div>
-            </div>
+            <p>
+              La confirmación añade jobs persistentes a la cola. Sólo los adapters realmente autorizados podrán ejecutar llamadas externas.
+            </p>
 
             <div className="confirmation-summary">
               {
@@ -1207,15 +850,6 @@ export function PublishView() {
 
                       <small>
                         {
-                          preflight[
-                            target.id
-                          ]?.executionMode
-                          === 'AUTO_API'
-                            ? '☁ AUTO'
-                            : '✋ MANUAL'
-                        }
-                        {' · '}
-                        {
                           target.scheduledAt
                             ? new Date(
                                 target.scheduledAt,
@@ -1235,33 +869,16 @@ export function PublishView() {
               onClick={enqueue}
             >
               <Send size={18}/>
-              CONFIRMAR {
+              PROGRAMAR {
                 selected.length
               } PUBLICACIÓN(ES)
             </button>
 
             {
-              message
-              && (
-                <div className="hybrid-success">
-                  {message}
-
-                  <button
-                    onClick={() =>
-                      setView('queue')
-                    }
-                  >
-                    Ver cola
-                  </button>
-                </div>
-              )
-            }
-
-            {
               !allReady
               && (
                 <div className="account-warning">
-                  Hay contenido bloqueado por un problema real. La falta de API por sí sola no bloquea.
+                  Existen destinos sin cuenta API autorizada o con preflight bloqueado.
                 </div>
               )
             }
@@ -1287,7 +904,9 @@ export function PublishView() {
         </button>
 
         <span>
-          {message}
+          {
+            message
+          }
         </span>
 
         {

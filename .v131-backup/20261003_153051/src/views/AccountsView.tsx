@@ -242,7 +242,7 @@ export function AccountsView() {
           </h1>
 
           <p>
-            Conecta las APIs que quieras. Las redes sin API siguen funcionando en modo manual asistido.
+            Un único lugar para cuentas API, cuentas externas y capacidades de publicación.
           </p>
         </div>
 
@@ -345,7 +345,7 @@ export function AccountsView() {
                     <div className="account-warning">
                       <Link2 size={14}/>
 
-                      OAuth pendiente. Hasta conectarla, Publisher usará publicación manual asistida para esta cuenta.
+                      Falta completar OAuth para habilitar publicación API real.
                     </div>
                   )
                 }

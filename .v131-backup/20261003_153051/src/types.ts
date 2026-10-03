@@ -253,16 +253,7 @@ export interface PreflightReport {
   targetId: string
   accountId?: string | null
   provider: string
-
-  // AUTO_API | MANUAL
-  executionMode: string
-
-  needsManualAction: boolean
-
-  // true también puede significar
-  // "listo para publicación manual".
   ready: boolean
-
   checks: PreflightCheck[]
 }
 

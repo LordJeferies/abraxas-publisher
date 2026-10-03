@@ -2,6 +2,9 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock3,
+  Cloud,
+  ExternalLink,
+  Hand,
   LoaderCircle,
   RefreshCcw,
 } from 'lucide-react'
@@ -24,23 +27,67 @@ import type {
   PublishJob,
 } from '../types'
 
-const groups = [
-  'REVIEW_REQUIRED',
-  'QUEUED',
-  'DISPATCHING',
-  'PROCESSING_REMOTE',
-  'VERIFYING',
-  'SCHEDULED_REMOTE',
-  'SCHEDULED_EXTERNAL',
-  'PUBLISHED',
-  'FAILED',
-]
+function manualTemporalStatus(
+  job: PublishJob,
+) {
+  if (
+    job.mode !== 'MANUAL'
+    || !job.scheduledFor
+  ) {
+    return job.status
+  }
+
+  if (
+    job.status
+    === 'PUBLISHED_EXTERNAL'
+    || job.status
+      === 'SCHEDULED_EXTERNAL'
+  ) {
+    return job.status
+  }
+
+  const when =
+    new Date(
+      job.scheduledFor,
+    ).getTime()
+
+  const now =
+    Date.now()
+
+  if (
+    !Number.isFinite(
+      when,
+    )
+  ) {
+    return 'MANUAL_REQUIRED'
+  }
+
+  if (
+    now >= when
+  ) {
+    return 'MANUAL_OVERDUE'
+  }
+
+  if (
+    when - now
+    <= 30 * 60 * 1000
+  ) {
+    return 'MANUAL_DUE'
+  }
+
+  return 'MANUAL_REQUIRED'
+}
 
 function JobIcon({
-  status,
+  job,
 }: {
-  status: string
+  job: PublishJob
 }) {
+  const status =
+    manualTemporalStatus(
+      job,
+    )
+
   if (
     status === 'FAILED'
   ) {
@@ -52,10 +99,27 @@ function JobIcon({
   if (
     status === 'PUBLISHED'
     || status
-      === 'SCHEDULED_REMOTE'
+      === 'PUBLISHED_EXTERNAL'
   ) {
     return (
       <CheckCircle2/>
+    )
+  }
+
+  if (
+    status
+      === 'SCHEDULED_EXTERNAL'
+  ) {
+    return (
+      <ExternalLink/>
+    )
+  }
+
+  if (
+    job.mode === 'MANUAL'
+  ) {
+    return (
+      <Hand/>
     )
   }
 
@@ -68,6 +132,14 @@ function JobIcon({
   ) {
     return (
       <LoaderCircle/>
+    )
+  }
+
+  if (
+    job.mode === 'AUTO_API'
+  ) {
+    return (
+      <Cloud/>
     )
   }
 
@@ -113,25 +185,58 @@ export function QueueView() {
     [],
   )
 
-  const byStatus =
+  const counts =
     useMemo(
-      () =>
-        Object.fromEntries(
-          groups.map(
-            (status) => [
-              status,
-              jobs.filter(
-                (job) =>
-                  job.status
-                  === status,
+      () => ({
+        automatic:
+          jobs.filter(
+            (job) =>
+              job.mode
+              === 'AUTO_API',
+          ).length,
+
+        manual:
+          jobs.filter(
+            (job) =>
+              job.mode
+              === 'MANUAL'
+              && ![
+                'PUBLISHED_EXTERNAL',
+                'SCHEDULED_EXTERNAL',
+              ].includes(
+                job.status,
               ),
-            ],
-          ),
-        ) as
-        Record<
-          string,
-          PublishJob[]
-        >,
+          ).length,
+
+        due:
+          jobs.filter(
+            (job) =>
+              [
+                'MANUAL_DUE',
+                'MANUAL_OVERDUE',
+              ].includes(
+                manualTemporalStatus(
+                  job,
+                ),
+              ),
+          ).length,
+
+        external:
+          jobs.filter(
+            (job) =>
+              job.mode
+              === 'EXTERNAL'
+              || job.status
+              === 'SCHEDULED_EXTERNAL',
+          ).length,
+
+        failed:
+          jobs.filter(
+            (job) =>
+              job.status
+              === 'FAILED',
+          ).length,
+      }),
       [
         jobs,
       ],
@@ -150,7 +255,7 @@ export function QueueView() {
           </h1>
 
           <p>
-            Jobs persistentes, reintentos, verificación y estado remoto.
+            Automáticas, manuales y programadas externamente en una sola agenda.
           </p>
         </div>
 
@@ -163,27 +268,62 @@ export function QueueView() {
         </button>
       </header>
 
-      <div className="queue-summary">
-        {
-          groups.map(
-            (status) => (
-              <div key={status}>
-                <strong>
-                  {
-                    byStatus[
-                      status
-                    ]?.length
-                    || 0
-                  }
-                </strong>
+      <div className="queue-summary hybrid">
+        <div>
+          <Cloud/>
+          <strong>
+            {counts.automatic}
+          </strong>
+          <span>
+            automáticas
+          </span>
+        </div>
 
-                <span>
-                  {status}
-                </span>
-              </div>
-            ),
-          )
-        }
+        <div>
+          <Hand/>
+          <strong>
+            {counts.manual}
+          </strong>
+          <span>
+            manuales
+          </span>
+        </div>
+
+        <div
+          className={
+            counts.due
+              ? 'attention'
+              : ''
+          }
+        >
+          <Clock3/>
+          <strong>
+            {counts.due}
+          </strong>
+          <span>
+            requieren atención
+          </span>
+        </div>
+
+        <div>
+          <ExternalLink/>
+          <strong>
+            {counts.external}
+          </strong>
+          <span>
+            externas
+          </span>
+        </div>
+
+        <div>
+          <AlertTriangle/>
+          <strong>
+            {counts.failed}
+          </strong>
+          <span>
+            errores
+          </span>
+        </div>
       </div>
 
       <section className="panel job-list">
@@ -197,9 +337,22 @@ export function QueueView() {
                     === job.contentId,
                 )
 
+              const displayStatus =
+                manualTemporalStatus(
+                  job,
+                )
+
               return (
                 <button
-                  className="job-row"
+                  className={
+                    displayStatus
+                    === 'MANUAL_OVERDUE'
+                      ? 'job-row manual-overdue'
+                      : displayStatus
+                        === 'MANUAL_DUE'
+                        ? 'job-row manual-due'
+                        : 'job-row'
+                  }
                   key={job.id}
                   onClick={() => {
                     if (
@@ -213,13 +366,11 @@ export function QueueView() {
                 >
                   <div
                     className={
-                      `job-icon status-${job.status}`
+                      `job-icon status-${displayStatus}`
                     }
                   >
                     <JobIcon
-                      status={
-                        job.status
-                      }
+                      job={job}
                     />
                   </div>
 
@@ -228,6 +379,10 @@ export function QueueView() {
                       {
                         job.provider
                           .toUpperCase()
+                      }
+                      {' · '}
+                      {
+                        job.mode
                       }
                     </small>
 
@@ -251,16 +406,30 @@ export function QueueView() {
 
                   <div className="job-state">
                     <b>
-                      {job.status}
+                      {
+                        displayStatus
+                      }
                     </b>
 
-                    <small>
-                      intento {
-                        job.attempt
-                      } / {
-                        job.maxAttempts
-                      }
-                    </small>
+                    {
+                      job.mode
+                      === 'MANUAL'
+                      && (
+                        <small>
+                          Publicar manualmente
+                        </small>
+                      )
+                    }
+
+                    {
+                      job.mode
+                      === 'AUTO_API'
+                      && (
+                        <small>
+                          Publisher se encargará
+                        </small>
+                      )
+                    }
                   </div>
                 </button>
               )

@@ -1,0 +1,10 @@
+PLATFORM: instagram
+ACCOUNT: joc_instagram
+TYPE: carousel
+DATE: 2026-10-06
+TIME: 11:00
+TITLE: Valor percibido
+CLIENT: JOC
+
+COPY:
+El valor no está en cuántas tareas haces. Está en lo que el cliente entiende que cambia gracias a ellas.

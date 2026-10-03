@@ -1,0 +1,10 @@
+PLATFORM: youtube
+ACCOUNT: joc_youtube
+TYPE: short
+DATE: 2026-10-08
+TIME: 17:00
+TITLE: Objeciones repetidas
+CLIENT: JOC
+
+COPY:
+Una objeción repetida puede ser una señal de posicionamiento.

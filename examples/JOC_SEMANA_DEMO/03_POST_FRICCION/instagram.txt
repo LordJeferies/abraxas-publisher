@@ -1,0 +1,10 @@
+PLATFORM: instagram
+ACCOUNT: joc_instagram
+TYPE: image
+DATE: 2026-10-07
+TIME: 12:00
+TITLE: Fricción de compra
+CLIENT: JOC
+
+COPY:
+A veces el problema no es la objeción. Es la cantidad de decisiones que obligas al cliente a tomar.

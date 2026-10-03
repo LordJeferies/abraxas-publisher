@@ -1,0 +1,10 @@
+PLATFORM: facebook
+ACCOUNT: joc_facebook
+TYPE: image
+DATE: 2026-10-07
+TIME: 12:15
+TITLE: Fricción de compra
+CLIENT: JOC
+
+COPY:
+Reducir fricción también es diseñar una decisión más simple.

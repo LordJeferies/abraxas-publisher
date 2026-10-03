@@ -1,0 +1,10 @@
+PLATFORM: linkedin
+ACCOUNT: joc_linkedin
+TYPE: video
+DATE: 2026-10-05
+TIME: 14:00
+TITLE: Criterio de decisión
+CLIENT: JOC
+
+COPY:
+Cuando el comprador no tiene criterio de decisión, más información puede aumentar la fricción.

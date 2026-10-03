@@ -1,0 +1,4 @@
+ABRAXAS Publisher
+Version: 0.2.0
+Product stage: v1.1 Planning & Review
+Next stage: Paso 2 — provider authentication/adapters (publication batch remains last test)

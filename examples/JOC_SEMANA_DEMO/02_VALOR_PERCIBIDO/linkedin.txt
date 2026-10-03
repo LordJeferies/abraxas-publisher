@@ -1,0 +1,10 @@
+PLATFORM: linkedin
+ACCOUNT: joc_linkedin
+TYPE: carousel
+DATE: 2026-10-06
+TIME: 15:30
+TITLE: Valor percibido
+CLIENT: JOC
+
+COPY:
+Un ejemplo práctico de cómo pasar de enumerar tareas a demostrar criterio.

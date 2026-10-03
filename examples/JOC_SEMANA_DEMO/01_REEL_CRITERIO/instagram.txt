@@ -1,0 +1,10 @@
+PLATFORM: instagram
+ACCOUNT: joc_instagram
+TYPE: reel
+DATE: 2026-10-05
+TIME: 10:00
+TITLE: Criterio de decisión
+CLIENT: JOC
+
+COPY:
+Tu cliente no necesita más información. Necesita un criterio para decidir.

@@ -1,0 +1,7 @@
+PLATFORM: instagram
+TYPE: reel
+TITLE: Objeciones repetidas
+CLIENT: JOC
+
+COPY:
+Si la misma objeción aparece una y otra vez, deja de tratarla como accidente.

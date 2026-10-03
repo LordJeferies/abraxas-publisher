@@ -1,0 +1,6 @@
+cd "$HOME/Downloads" \
+&& rm -rf abraxas-publisher-v1.1 \
+&& unzip -q abraxas-publisher-v1.1.zip \
+&& cd abraxas-publisher-v1.1 \
+&& chmod +x *.command scripts/*.sh \
+&& ./ACTUALIZAR_ABRAXAS_PUBLISHER.command

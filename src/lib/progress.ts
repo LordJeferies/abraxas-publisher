@@ -8,6 +8,9 @@ export type ProgressState = {
 
 const EVENT = 'abraxas-progress'
 
+let legacyTimer: number | null = null
+let legacyPercent = 8
+
 function emit(state: ProgressState) {
   window.dispatchEvent(
     new CustomEvent<ProgressState>(
@@ -29,6 +32,61 @@ export function onProgress(
 
   return () =>
     window.removeEventListener(EVENT, handler)
+}
+
+export function setLegacyLoading(
+  active: boolean,
+  label = 'Procesando…',
+) {
+  if (!active) {
+    if (legacyTimer !== null) {
+      window.clearInterval(legacyTimer)
+      legacyTimer = null
+    }
+
+    emit({
+      active: false,
+      label: '',
+      percent: 0,
+      blocking: false,
+    })
+
+    return
+  }
+
+  legacyPercent = 8
+
+  emit({
+    active: true,
+    label,
+    detail: 'Puedes seguir usando Publisher mientras termina.',
+    percent: legacyPercent,
+    blocking: false,
+  })
+
+  if (legacyTimer !== null) {
+    window.clearInterval(legacyTimer)
+  }
+
+  legacyTimer = window.setInterval(() => {
+    if (legacyPercent >= 92) return
+
+    legacyPercent = Math.min(
+      92,
+      legacyPercent + Math.max(
+        1,
+        Math.round((92 - legacyPercent) / 8),
+      ),
+    )
+
+    emit({
+      active: true,
+      label,
+      detail: 'Puedes seguir usando Publisher mientras termina.',
+      percent: legacyPercent,
+      blocking: false,
+    })
+  }, 420)
 }
 
 export async function runProgressTask<T>(

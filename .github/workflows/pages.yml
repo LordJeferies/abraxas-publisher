@@ -46,6 +46,8 @@ jobs:
           test -f dist/index.html
           test -f dist/guide.html
           test -f dist/mcp.html
+          test -f dist/install.html
+          test -f dist/ABRAXAS_PUBLISHER_INSTALL.command
           test -f dist/manifest.webmanifest
           test -f dist/sw.js
           cp dist/index.html dist/404.html

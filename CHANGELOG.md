@@ -95,3 +95,18 @@ No remote publishing is claimed without remote verification.
 - Drive token remains in memory.
 - Desktop keeps native Google Drive OAuth.
 - PWA download button for macOS Desktop.
+
+## MCP control layer
+
+- MCP server local por stdio: `mcp/server.mjs`.
+- Bridge Rust: `publisher_mcp_bridge`.
+- El MCP usa la misma SQLite y módulos `db`, `scanner`, `core` y `publishing` de la app.
+- Tools para marcas, fichas, refresh/import, estados, correcciones, calendario, actividad, undo/redo y dry-run.
+- Tools para Accounts Center, publication jobs, preflight, enqueue y `SCHEDULED_EXTERNAL`.
+- Tools para configuración pública de Google Drive y apertura Desktop/Web.
+- Acciones sensibles requieren `confirm: true`.
+- Google OAuth sigue siendo interactivo; el MCP no persiste tokens.
+- Prompts incluidos para revisión diaria, preparación semanal y corrección de fichas.
+- Instalación con `INSTALAR_MCP.command` o `npm run mcp:install`.
+- CI dedicado en `.github/workflows/mcp-ci.yml`.
+- Documentación completa en `docs/MCP.md`.

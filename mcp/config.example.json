@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "abraxas-publisher": {
+      "command": "node",
+      "args": [
+        "/Users/TU_USUARIO/Developer/abraxas-publisher/mcp/server.mjs"
+      ],
+      "env": {
+        "ABRAXAS_PUBLISHER_MCP_BRIDGE": "/Users/TU_USUARIO/Developer/abraxas-publisher/src-tauri/target/release/publisher_mcp_bridge"
+      }
+    }
+  }
+}

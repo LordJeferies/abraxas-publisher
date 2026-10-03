@@ -1,0 +1,43 @@
+name: ABRAXAS Publisher MCP CI
+
+on:
+  push:
+    branches:
+      - main
+      - v1.3-publishing-center
+    paths:
+      - 'mcp/**'
+      - 'src-tauri/src/bin/publisher_mcp_bridge.rs'
+      - 'src-tauri/src/**'
+      - 'src-tauri/Cargo.toml'
+      - 'src-tauri/Cargo.lock'
+      - '.github/workflows/mcp-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  mcp:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo check MCP bridge
+        run: cargo check --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge
+
+      - name: Cargo test
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Build MCP bridge
+        run: cargo build --release --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge
+
+      - name: MCP self-test
+        run: node mcp/server.mjs --self-test

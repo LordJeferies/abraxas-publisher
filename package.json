@@ -14,6 +14,8 @@
     "mcp:check": "cargo check --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge",
     "mcp:build": "cargo build --release --manifest-path src-tauri/Cargo.toml --bin publisher_mcp_bridge",
     "mcp:test": "npm run mcp:build && node mcp/server.mjs --self-test",
+    "mcp:selftest": "node mcp/server.mjs --self-test",
+    "mcp:start": "node mcp/server.mjs",
     "mcp:install": "bash mcp/install.sh"
   },
   "dependencies": {

@@ -1,0 +1,170 @@
+Trabaja AUTÓNOMAMENTE sobre este repositorio hasta implementar ABRAXAS
+Publisher V1.2.
+
+Lee primero, completos:
+
+AGENTS.md
+docs/V12_REQUIREMENTS.md
+README.md
+START_HERE.md
+HANDOFF_AI.md
+docs/ARCHITECTURE.md
+docs/STATE_MACHINE.md
+docs/GOOGLE_DRIVE.md
+docs/TXT_PROTOCOL.md
+todos los QA existentes en qa/
+
+Después inspecciona el código real.
+
+También tienes referencias locales:
+
+.references/Abrxs-Review/
+.references/editorial-emulator/
+
+Abrxs-Review contiene una implementación previa de navegación/autorización
+Google Drive que puede reutilizarse conceptualmente, pero Publisher es una
+aplicación Tauri Desktop y debe usar un flujo apropiado de Desktop OAuth.
+
+Editorial Emulator sirve como referencia para:
+
+- welcome;
+- content rail;
+- drag and drop;
+- interacción táctil;
+- planificación.
+
+NO copies ciegamente sus arquitecturas.
+
+OBJETIVO:
+
+Implementar DE VERDAD todos los requisitos de docs/V12_REQUIREMENTS.md.
+
+No te limites a cambiar textos o añadir botones falsos.
+
+Reglas:
+
+- trabaja sobre la app existente;
+- preserva el diseño que ya funciona;
+- conserva com.abraxas.publisher;
+- crea migraciones SQLite compatibles;
+- no borres datos existentes;
+- no realices llamadas a APIs sociales;
+- no publiques nada;
+- no uses tokens sociales;
+- no hagas git push;
+- no hagas merge;
+- el wrapper externo gestiona Git.
+
+Google Drive:
+
+- implementar botón real dentro de la app;
+- configuración de Desktop OAuth Client ID;
+- navegador del sistema;
+- loopback 127.0.0.1;
+- Drive browser;
+- navegación de carpetas;
+- búsqueda;
+- importación;
+- ninguna credencial real en repo;
+- app sigue funcionando sin Drive configurado.
+
+Duplicados:
+
+- preflight antes de escribir;
+- replace;
+- keep both;
+- skip;
+- bulk decisions;
+- no reemplazo silencioso.
+
+Calendario:
+
+- día;
+- semana;
+- mes;
+- drag real;
+- Sin calendarizar;
+- filtros;
+- búsqueda;
+- move all/one/selected networks;
+- scheduled remote bloqueado.
+
+Inspector:
+
+- oculto sin selección;
+- docked;
+- floating;
+- hide;
+- persistir preferencia.
+
+Activity / Undo / Redo:
+
+- audit persistente;
+- local reversible;
+- remote irreversible.
+
+CLI:
+
+publisherctl
+
+MCP:
+
+publisher-mcp stdio real.
+Implementa initialize, tools/list y tools/call de forma suficiente para un
+cliente MCP estándar.
+
+QA:
+
+Los tests deben usar DB/carpeta temporal.
+No alterar la base real del usuario.
+
+IMPORTANTE:
+
+Ejecuta durante el desarrollo:
+
+npm ci
+npm run check
+npm run build
+cargo check
+cargo test
+
+Si agregas test scripts, ejecútalos.
+
+Ejecuta publisherctl qa.
+
+Ejecuta publisher-mcp --self-test.
+
+Corrige cualquier error que encuentres.
+
+Haz las iteraciones necesarias.
+
+No pares en el primer error.
+
+No afirmes que algo está implementado sólo porque existe una interfaz.
+
+Actualiza:
+
+VERSION.txt
+package.json
+Cargo.toml si corresponde
+README.md
+START_HERE.md
+HANDOFF_AI.md
+CHANGELOG.md
+docs relevantes.
+
+Usa versión de aplicación 0.3.0 para esta V1.2 si no existe una razón fuerte
+para otra numeración.
+
+Al terminar deja el working tree con la implementación completa y los tests
+pasando.
+
+NO hagas commit ni push.
+
+En tu respuesta final resume:
+
+1. qué implementaste;
+2. qué tests pasaron;
+3. cualquier limitación real restante;
+4. si Google Drive requiere todavía configurar Client ID;
+5. archivos principales modificados.

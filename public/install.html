@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Instalar ABRAXAS Publisher</title>
+  <style>
+    :root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 20%,rgba(51,73,139,.22),transparent 34%),radial-gradient(circle at 85% 80%,rgba(91,52,141,.16),transparent 34%),#0c0f14;color:#f5f7f8}
+    .wrap{width:min(980px,calc(100% - 28px));margin:0 auto;padding:34px 0 60px}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:54px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:750;letter-spacing:.08em;font-size:12px}
+    .mark{width:34px;height:34px;border:1px solid rgba(255,255,255,.09);border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05)}
+    .nav a{color:rgba(255,255,255,.55);text-decoration:none;font-size:12px}
+    .hero{border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:40px;background:linear-gradient(180deg,rgba(29,32,39,.94),rgba(20,23,29,.92));box-shadow:0 30px 90px rgba(0,0,0,.36)}
+    .eyebrow{font-size:10px;letter-spacing:.16em;color:rgba(255,255,255,.42);font-weight:700}
+    h1{font-size:clamp(42px,7vw,76px);line-height:.95;letter-spacing:-.055em;margin:16px 0 20px;max-width:800px}
+    .lead{max-width:690px;color:rgba(255,255,255,.58);line-height:1.65;font-size:15px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+    .primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:14px;text-decoration:none;font-size:12px;font-weight:750}
+    .primary{background:#f1f2f4;color:#11151b}
+    .secondary{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:#eef0f2}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .card{border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px;background:rgba(255,255,255,.025)}
+    .card strong{display:block;font-size:12px;margin-bottom:7px}.card p{margin:0;color:rgba(255,255,255,.44);font-size:11px;line-height:1.55}
+    .steps{margin-top:24px;padding:24px;border:1px solid rgba(255,255,255,.07);border-radius:20px;background:rgba(255,255,255,.02)}
+    .steps h2{margin:0 0 14px;font-size:18px}.steps ol{margin:0;padding-left:20px;color:rgba(255,255,255,.58);line-height:1.8;font-size:12px}
+    .note{margin-top:16px;padding:14px 16px;border-radius:15px;background:rgba(255,193,75,.07);border:1px solid rgba(255,193,75,.14);color:rgba(255,255,255,.58);font-size:11px;line-height:1.6}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff}
+    footer{display:flex;flex-wrap:wrap;gap:14px;margin-top:24px;font-size:11px}footer a{color:rgba(255,255,255,.48)}
+    @media(max-width:760px){.wrap{padding-top:18px}.hero{padding:24px}.grid{grid-template-columns:1fr}.nav{margin-bottom:30px}.actions>a{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="nav">
+      <div class="brand"><span class="mark">✦</span><span>ABRAXAS PUBLISHER</span></div>
+      <a href="./">Abrir Web/PWA</a>
+    </nav>
+
+    <section class="hero">
+      <div class="eyebrow">INSTALACIÓN LIMPIA PARA MAC</div>
+      <h1>Publisher completo.<br/>Una sola instalación.</h1>
+      <p class="lead">Descarga el instalador, ábrelo y escribe tu clave. El instalador prepara dependencias, instala ABRAXAS Publisher, FFmpeg y el MCP, crea el acceso en el Escritorio y comprueba que todo funcione.</p>
+
+      <div class="actions">
+        <a class="primary" href="./ABRAXAS_PUBLISHER_INSTALL.command" download>Descargar instalador para Mac</a>
+        <a class="secondary" href="./guide.html">Ver guía de Publisher</a>
+        <a class="secondary" href="./mcp.html">Ver guía MCP</a>
+      </div>
+
+      <div class="grid">
+        <article class="card"><strong>Publisher Desktop</strong><p>Instala la app nativa en <code>~/Applications</code> y crea acceso en el Escritorio.</p></article>
+        <article class="card"><strong>Dependencias</strong><p>Comprueba Homebrew, Node, Rust/Cargo, Git y FFmpeg; instala lo que falte.</p></article>
+        <article class="card"><strong>MCP incluido</strong><p>Compila, instala y prueba el bridge MCP en una ruta estable del usuario.</p></article>
+      </div>
+
+      <div class="steps">
+        <h2>Cómo instalar</h2>
+        <ol>
+          <li>Pulsa <strong>Descargar instalador para Mac</strong>.</li>
+          <li>Abre <code>ABRAXAS_PUBLISHER_INSTALL.command</code> desde Descargas.</li>
+          <li>macOS abrirá Terminal. Escribe la clave de instalación.</li>
+          <li>Si macOS pide herramientas de Apple o contraseña de administrador, complétalo.</li>
+          <li>Al terminar, Publisher se abrirá automáticamente.</li>
+        </ol>
+      </div>
+
+      <div class="note">La clave funciona como control de conveniencia para el instalador. Esta página y el instalador son públicos, así que no debe considerarse un mecanismo de seguridad para secretos o datos sensibles.</div>
+    </section>
+
+    <footer>
+      <a href="./">Publisher Web</a>
+      <a href="./guide.html">Guía general</a>
+      <a href="./mcp.html">Guía MCP</a>
+      <a href="https://github.com/LordJeferies/abraxas-publisher">GitHub</a>
+    </footer>
+  </main>
+</body>
+</html>

@@ -45,6 +45,15 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Verify static guide
+        run: |
+          test -f dist/index.html
+          test -f dist/guide.html
+          test -f dist/manifest.webmanifest
+          test -f dist/sw.js
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
